@@ -1,0 +1,17 @@
+{
+    "port": 58001,
+    "path": {
+        "storage": {
+            "name": "storage",
+            "contents": {
+                "name": "contents"
+            },
+            "temp": {
+                "name": "temp"
+            },
+            "meta": {
+                "name": "meta.json"
+            }
+        }
+    }
+}

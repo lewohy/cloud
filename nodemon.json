@@ -1,0 +1,13 @@
+{
+    "$schema": "https://json.schemastore.org/nodemon.json",
+    "watch": [
+        "./src/**/*",
+        "./public/**/*",
+        "./package.json",
+        "./tsconfig.json",
+        "./nodemon.json",
+        "./config.json"
+    ],
+    "ext": "js,jsx,ts,tsx,json",
+    "exec": "node --loader ts-node/esm -r tsconfig-paths/register ./src/index.ts"
+}
