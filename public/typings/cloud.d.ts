@@ -8,23 +8,25 @@ namespace cloud {
     }
 
     interface Entity {
-        type: EntityType;
+        type: cloud.EntityType;
         name: string;
         state: cloud.FileState;
     }
 
-    interface Directory extends Entity {
+    interface Directory extends cloud.Entity {
         createdTime: number;
     }
 
-    interface File extends Entity {
+    interface File extends cloud.Entity {
         size: number;
         uploaded: number;
         createdTime: number;
     }
 
+    type Item = cloud.File | cloud.Directory;
+
     interface Meta {
-        entities: cloud.Entity[];
+        items: cloud.Item[];
     }
 
     namespace protocol {
@@ -38,9 +40,9 @@ namespace cloud {
                 
             }
 
-            interface GetStorageResponse {
-                result: Result;
-                entities?: Array<File | Directory>;
+            interface GetResponse {
+                result: cloud.protocol.Result;
+                items?: cloud.Item[];
             }
             
             interface PostRequest {
@@ -48,7 +50,7 @@ namespace cloud {
             }
 
             interface PostResponse {
-                result: Result;
+                result: cloud.protocol.Result;
             }
 
             interface DeleteRequest {
@@ -56,7 +58,7 @@ namespace cloud {
             }
 
             interface DeleteResponse {
-                result: Result;
+                result: cloud.protocol.Result;
             }
 
             interface PutRequest {
@@ -66,7 +68,7 @@ namespace cloud {
             }
 
             interface PutResponse {
-                result: Result;
+                result: cloud.protocol.Result;
             }
         }
     }

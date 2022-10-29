@@ -20,14 +20,14 @@ export function sendError(res: core.Response, e: unknown): void {
                 successed: false,
                 message: e.message
             }
-        } as cloud.protocol.storage.GetStorageResponse);
+        } as cloud.protocol.storage.GetResponse);
     } else {
         res.send({
             result: {
                 successed: false,
                 message: 'unknown error'
             }
-        } as cloud.protocol.storage.GetStorageResponse);
+        } as cloud.protocol.storage.GetResponse);
     }
 }
 

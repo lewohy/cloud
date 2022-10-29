@@ -9,7 +9,7 @@ export interface FileListProps {
 }
 
 export const FileList = (props: FileListProps) => {
-    const [entityList, setEntityList] = createSignal<cloud.Entity[]>([]);
+    const [itemList, setItemList] = createSignal<cloud.Item[]>([]);
     const [uploadQueue, setUploadQueue] = createSignal<FileSystemFileEntry[]>([]);
 
     const addToPending = (entry: FileSystemEntry) => {
@@ -82,14 +82,14 @@ export const FileList = (props: FileListProps) => {
                     state: 'normal'
                 }} />
 
-                <For
-                    each={entityList()}>
-                    {(entity: cloud.Entity) => (
-                        <FileListItem
-                            entity={entity} />
-                    )}
-                </For>
-            
+            <For
+                each={itemList()}>
+                {(item: cloud.Item) => (
+                    <FileListItem
+                        item={item} />
+                )}
+            </For>
+
         </Stack>
     );
 };

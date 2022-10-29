@@ -22,7 +22,7 @@ export default function startUploadServer(app: core.Express) {
             }
 
             await modifyMeta(location, async (meta) => {
-                const entity = meta.entities.find((e) => e.name === filename);
+                const entity = meta.items.find((e) => e.name === filename);
 
                 if (entity === undefined) {
                     throw new Error(`Invalid access. There is no pending file. ${location.scope}/${location.path.join('/')}/${filename}`);

@@ -17,8 +17,8 @@ export default function startAPIServer(app: core.Express) {
                 result: {
                     successed: true
                 },
-                entities: meta.entities
-            } as cloud.protocol.storage.GetStorageResponse);
+                items: meta.items
+            } as cloud.protocol.storage.GetResponse);
 
         } catch (e) {
             sendError(res, e);

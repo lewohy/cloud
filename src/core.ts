@@ -79,10 +79,10 @@ export async function createDirectory(location: cloud.Location, entity: cloud.En
         });
 
         fs.writeFileSync(path.resolve(absolutePath, entity.name, config.path.storage.meta.name), JSON.stringify({
-            entities: []
+            items: []
         } as cloud.Meta, null, 4));
 
-        meta.entities.push({
+        meta.items.push({
             ...entity,
             createdTime: dayjs().valueOf()
         } as cloud.Directory);
@@ -99,7 +99,7 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
             throw new Error(`No base directory found. ${location.scope}/${location.path.join('/')}`);
         }
         
-        const file = meta.entities.find((e) => e.name === entity.name);
+        const file = meta.items.find((e) => e.name === entity.name);
         if (file !== undefined) {
             if (isFile(file)) {
                 file.createdTime = dayjs().valueOf();
@@ -107,7 +107,7 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
                 throw new Error(`The entity is directory. ${location.scope}/${location.path.join('/')}/${file.name}`);
             }
         } else {
-            meta.entities.push({
+            meta.items.push({
                 ...entity,
                 createdTime: dayjs().valueOf(),
                 size: 0,
@@ -129,7 +129,7 @@ export function deleteTempFile(location: cloud.Location, filename: string): void
 
 export async function writeToTemp(location: cloud.Location, filename: string, data: Buffer): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
-        if (meta.entities.find((e) => e.name === filename) === undefined) {
+        if (meta.items.find((e) => e.name === filename) === undefined) {
             throw new Error(`No meta found. ${location.scope}/${location.path.join('/')}`);
         }
 
@@ -140,7 +140,7 @@ export async function writeToTemp(location: cloud.Location, filename: string, da
             encoding: 'binary'
         });
 
-        const file = meta.entities.find((e) => e.name === filename) as cloud.File;
+        const file = meta.items.find((e) => e.name === filename) as cloud.File;
         file.state = 'uploading';
         file.uploaded += data.length;
 
@@ -156,14 +156,14 @@ export async function deleteFile(location: cloud.Location, filename: string): Pr
             throw new Error(`No entity found. ${location.scope}/${location.path.join('/')}`);
         }
 
-        const file = meta.entities.find((e) => e.name === filename);
+        const file = meta.items.find((e) => e.name === filename);
         if (file === undefined) {
             throw new Error(`No meta found. ${location.scope}/${location.path.join('/')}/${filename}`);
         }
 
         fs.unlinkSync(path.resolve(absolutePath, filename));
 
-        meta.entities = meta.entities.filter((e) => e.name !== filename);
+        meta.items = meta.items.filter((e) => e.name !== filename);
 
         return meta;
     });
@@ -178,7 +178,7 @@ export async function renameFile(location: cloud.Location, entity: cloud.Entity,
             throw new Error(`No entity found. ${location.scope}/${location.path.join('/')}/${entity.name}`);
         }
 
-        const file = meta.entities.find((e) => e.name === entity.name);
+        const file = meta.items.find((e) => e.name === entity.name);
         if (file === undefined) {
             throw new Error(`No meta found. ${location.scope}/${location.path.join('/')}/${entity.name}`);
         }
@@ -210,7 +210,7 @@ export async function commitFile(location: cloud.Location, filename: string): Pr
 
         fs.renameSync(absoluteTempPath, absoluteContentsPath);
 
-        const file = meta.entities.find((e) => e.name === filename) as cloud.File;
+        const file = meta.items.find((e) => e.name === filename) as cloud.File;
         file.state = 'normal';
 
         return meta;
