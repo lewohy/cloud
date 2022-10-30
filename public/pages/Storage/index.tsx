@@ -32,8 +32,11 @@ export const Storage = (props: StorageProps) => {
     const params = useParams<StorageParams>();
 
     const scope = createMemo(() => params.scope);
-    const path = createMemo(() => params.path.split('/'));
+    const path = createMemo(() => params.path.length === 0 ? [] : params.path.split('/'));
+    const navigate = useNavigate();
+    
 
+    console.log(scope());
 
     return (
         <ThemeProvider theme={theme}>
@@ -51,6 +54,9 @@ export const Storage = (props: StorageProps) => {
                             sx={{
                                 margin: '16px 0px',
                             }}>
+                            <PathItem
+                                href={`/storage/${scope()}`}
+                                text={scope()} />
                             <For each={path()}>
                                 {(item: string, index: () => number) => (
                                     // TODO: 매우 길어진 경우에 처리하기
@@ -63,7 +69,13 @@ export const Storage = (props: StorageProps) => {
                     </Stack>
                     <FileList
                         scope={scope()}
-                        path={path()}/>
+                        path={path()}
+                        onUpClick={() => {
+                            navigate(`/storage/${scope()}/${path().slice(0, -1).join('/')}`);
+                        }}
+                        onItemClick={item => {
+                            navigate(`/storage/${scope()}/${path().concat(item.name).join('/')}`);
+                        }}/>
                 </Stack>
             </Container>
         </ThemeProvider>
