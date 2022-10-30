@@ -14,7 +14,7 @@ export async function modifyMeta(location: cloud.Location, callback: (meta: clou
         const absolutePath = getAbsoluteMetaPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`Not found. ${location.scope}/${location.path.join('/')}`);
+            throw new Error(`Not found. ${[location.scope, ...location.path].join('/')}`);
         }
 
         return JSON.parse(fs.readFileSync(absolutePath, 'utf-8'));
@@ -66,7 +66,7 @@ export async function createDirectory(location: cloud.Location, entity: cloud.En
         const absolutePath = getAbsoluteContentsPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`Not found. ${location.scope}/${location.path.join('/')}`);
+            throw new Error(`Not found. ${[location.scope, ...location.path].join('/')}`);
         }
 
 
@@ -96,7 +96,7 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
         const absolutePath = getAbsoluteContentsPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`No base directory found. ${location.scope}/${location.path.join('/')}`);
+            throw new Error(`No base directory found. ${[location.scope, ...location.path].join('/')}`);
         }
         
         const file = meta.items.find((e) => e.name === entity.name);
@@ -104,7 +104,7 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
             if (isFile(file)) {
                 file.createdTime = dayjs().valueOf();
             } else {
-                throw new Error(`The entity is directory. ${location.scope}/${location.path.join('/')}/${file.name}`);
+                throw new Error(`The entity is directory. ${[location.scope, ...location.path].join('/')}/${file.name}`);
             }
         } else {
             meta.items.push({
@@ -130,7 +130,7 @@ export function deleteTempFile(location: cloud.Location, filename: string): void
 export async function writeToTemp(location: cloud.Location, filename: string, data: Buffer): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
         if (meta.items.find((e) => e.name === filename) === undefined) {
-            throw new Error(`No meta found. ${location.scope}/${location.path.join('/')}`);
+            throw new Error(`No meta found. ${[location.scope, ...location.path].join('/')}`);
         }
 
         const absolutePath = getAbsoluteTempPath(location);
@@ -153,12 +153,12 @@ export async function deleteFile(location: cloud.Location, filename: string): Pr
         const absolutePath = getAbsoluteContentsPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`No entity found. ${location.scope}/${location.path.join('/')}`);
+            throw new Error(`No entity found. ${[location.scope, ...location.path].join('/')}`);
         }
 
         const file = meta.items.find((e) => e.name === filename);
         if (file === undefined) {
-            throw new Error(`No meta found. ${location.scope}/${location.path.join('/')}/${filename}`);
+            throw new Error(`No meta found. ${[location.scope, ...location.path].join('/')}/${filename}`);
         }
 
         fs.unlinkSync(path.resolve(absolutePath, filename));
