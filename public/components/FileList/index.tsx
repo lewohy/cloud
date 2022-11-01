@@ -3,6 +3,7 @@ import axios from 'axios';
 import path from 'path';
 import { createEffect, createSignal, For } from 'solid-js';
 import { FileListItem } from './FileListItem';
+import { FunctionBar } from './FunctionBar';
 
 export interface FileListProps {
     scope: string;
@@ -87,6 +88,8 @@ export const FileList = (props: FileListProps) => {
             sx={{
                 height: '100%',
             }}>
+
+            <FunctionBar/>
                 
             {
                 props.path.length > 0 &&
