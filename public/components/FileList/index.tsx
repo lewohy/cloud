@@ -1,9 +1,11 @@
 import Stack from '@suid/material/Stack';
 import axios from 'axios';
 import path from 'path';
+import random from 'random';
 import { createEffect, createSignal, For } from 'solid-js';
 import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
+import { UpItem } from './UpItem';
 
 export interface FileListProps {
     scope: string;
@@ -12,11 +14,18 @@ export interface FileListProps {
     onItemClick?: (item: cloud.Item) => void;
 }
 
+function createRandomNullArray(): Array<cloud.Item | null> {
+    return Array.from({
+        length: random.int(5, 10)
+    }, () => null);
+}
+
 export const FileList = (props: FileListProps) => {
-    const [itemList, setItemList] = createSignal<cloud.Item[]>([]);
+    const [itemList, setItemList] = createSignal<Array<cloud.Item | null>>(createRandomNullArray());
     const [uploadQueue, setUploadQueue] = createSignal<FileSystemFileEntry[]>([]);
 
     const refreshList = async () => {
+        setItemList(createRandomNullArray());
         const result = await axios.get<cloud.protocol.storage.GetResponse>(`/api/storage/${[props.scope, ...props.path].join('/')}`);
         const response = result.data;
 
@@ -56,7 +65,7 @@ export const FileList = (props: FileListProps) => {
                     const item = items[i];
                     const file = item.getAsFile();
                     const entry = item.webkitGetAsEntry();
-                    
+
                     if (entry !== null) {
                         addToPending(entry);
                     }
@@ -89,27 +98,45 @@ export const FileList = (props: FileListProps) => {
                 height: '100%',
             }}>
 
-            <FunctionBar/>
-                
+            <FunctionBar
+                onUploadClick={() => {
+                    // TODO: 파일 업로드
+                }}
+                onCreateFolderClick={() => {
+                    // TODO: 폴더 생성
+                }}
+                onCreateFileClick={() => {
+                    // TOOD: 파일 생성
+                }} />
+
             {
                 props.path.length > 0 &&
-                <FileListItem
+                <UpItem
                     onClick={e => {
                         props.onUpClick?.();
-                    }}/>
+                    }} />
             }
 
-            {/* TODO: 로딩 화면 구성하기 */}
-            <For
-                each={itemList()}>
-                {(item: cloud.Item) => (
-                    <FileListItem
-                        item={item}
-                        onClick={e => {
-                            props.onItemClick?.(item);
-                        }}/>
-                )}
-            </For>
+            {/*
+                TODO: 로딩 화면 구성하기
+                TODO: 새로고침 시 itemList초기화
+            */}
+
+            {
+                itemList() !== null &&
+                <For
+                    each={itemList()}>
+                    {(item: cloud.Item | null) => (
+                        <FileListItem
+                            item={item}
+                            onClick={e => {
+                                if (item !== null) {
+                                    props.onItemClick?.(item);
+                                }
+                            }} />
+                    )}
+                </For>
+            }
 
         </Stack>
     );

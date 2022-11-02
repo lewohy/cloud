@@ -6,6 +6,9 @@ import Upload from "@suid/icons-material/Upload"
 import Folder from '@suid/icons-material/Folder';
 
 export interface FunctionBarProps {
+    onUploadClick: () => void;
+    onCreateFolderClick: () => void;
+    onCreateFileClick: () => void;
 
 }
 
@@ -18,10 +21,16 @@ export const FunctionBar = (props: FunctionBarProps) => {
             justifyContent="flex-end"
             direction="row">
             
-            <Button>
+            <Button
+                onClick={e => {
+                    props.onUploadClick?.();
+                }}>
                 <Upload/>
             </Button>
-            <Button>
+            <Button
+                onClick={e => {
+                    props.onCreateFileClick?.();
+                }}>
                 <Stack
                     direction="row"
                     spacing={1}>
@@ -29,7 +38,10 @@ export const FunctionBar = (props: FunctionBarProps) => {
                     <InsertDriveFile/>
                 </Stack>
             </Button>
-            <Button>
+            <Button
+                onClick={e => {
+                    props.onCreateFolderClick?.();
+                }}>
                 <Stack
                     direction="row"
                     spacing={1}>
