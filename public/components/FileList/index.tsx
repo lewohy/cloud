@@ -58,6 +58,21 @@ export const FileList = (props: FileListProps) => {
         }
     };
 
+    const createFile = async (name: string) => {
+        try {
+            const result = await cr.post(`/api/storage/${[props.scope, ...props.path].join('/')}`, {
+                entity: {
+                    type: 'file',
+                    name,
+                    state: 'normal'
+                }
+            });
+        } catch (error) {
+            // TODO: 요청 실패 처리하기
+            console.error(error);
+        }
+    };
+
     const addToPending = (entry: FileSystemEntry) => {
         if (entry.isDirectory) {
             const directoryEntry = entry as FileSystemDirectoryEntry;
@@ -138,8 +153,19 @@ export const FileList = (props: FileListProps) => {
                         }
                     }
                 }}
-                onCreateFileClick={() => {
-                    // TOOD: 파일 생성
+                onCreateFileClick={async () => {
+                    const result = await promptDialog.show(smulogContainer, {
+                        title: 'Create File'
+                    }, {
+                        message: '파일 이름을 입력하세요.',
+                        label: 'New File'
+                    });
+
+                    if (result.response === 'positive') {
+                        if (result.returns !== undefined) {
+                            createFile(result.returns.value);
+                        }
+                    }
                 }} />
 
             {
