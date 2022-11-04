@@ -5,11 +5,12 @@ import { useDialogContainer as useSmulogContainer } from '~/public/dialogs/dialo
 import promptDialog from '~/public/dialogs/PromptDialog';
 import path from 'path';
 import random from 'random';
-import { createEffect, createSignal, For } from 'solid-js';
+import { createEffect, createMemo, createSignal, For } from 'solid-js';
 import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
 import cr from '~/public/ts/cr';
+import { io } from 'socket.io-client';
 
 export interface FileListProps {
     scope: string;
@@ -28,6 +29,9 @@ export const FileList = (props: FileListProps) => {
     const [itemList, setItemList] = createSignal<cloud.Item[] | null>(null);
     const [uploadQueue, setUploadQueue] = createSignal<FileSystemFileEntry[]>([]);
     const smulogContainer = useSmulogContainer();
+    const socket = createMemo(() => io(location.origin, {
+        path: '/socket.io'
+    }));
 
     const refreshList = async () => {
         setItemList(null);
@@ -126,6 +130,7 @@ export const FileList = (props: FileListProps) => {
 
     createEffect(() => {
         refreshList();
+        
     }, []);
 
     return (

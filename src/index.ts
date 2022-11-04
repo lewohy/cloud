@@ -10,9 +10,11 @@ import startAPIServer from './servers/api';
 import startWebSocketServer from './servers/ws';
 import startUploadServer from './servers/upload';
 import logger from '~/src/logger';
+import http from 'http';
 
 async function createServer() {
     const app = express();
+    const server = http.createServer(app);
     const viteServer = await vite.createServer();
 
     // TODO: 이거 수정
@@ -28,14 +30,14 @@ async function createServer() {
     app.use('/api', express.json());
     app.set('etag', false);
 
-    const server = app.listen(config.port, () => {
-        logger.info(`Server is listening on port ${config.port}`);
-    });
-
     startUploadServer(app);
     startAPIServer(app);
     startWebServer(app);
     startWebSocketServer(server);
+    
+    server.listen(config.port, () => {
+        logger.info(`Server is listening on port ${config.port}`);
+    });
 }
 
 createServer();
