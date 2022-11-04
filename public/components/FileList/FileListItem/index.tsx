@@ -39,7 +39,10 @@ export const FileListItem = (props: FileListItemProps) => {
                     <Skeleton
                         variant='rectangular'
                         width={48}
-                        height={48} />
+                        height={48}
+                        sx={{
+                            borderRadius: '8px'
+                        }} />
                 }
 
                 {
