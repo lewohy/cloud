@@ -70,7 +70,7 @@ export async function createDirectory(location: cloud.Location, entity: cloud.En
         const absolutePath = getAbsoluteContentsPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`Not found. ${[location.scope, ...location.path].join('/')}`);
+            throw new Error(`Not found base folder. ${[location.scope, ...location.path].join('/')}`);
         }
 
         if (fs.existsSync(path.resolve(absolutePath, entity.name))) {
