@@ -22,9 +22,7 @@ async function createServer() {
             return viteServer.middlewares(req, res, next);
         }
     });
-    // app.use('/upload', fileUpload({
-    //     defCharset: 'utf-8'
-    // }));
+    
     app.use(nocache());
     app.use('/api', express.json());
     app.set('etag', false);

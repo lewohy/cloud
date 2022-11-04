@@ -5,29 +5,27 @@ const logger = winston.createLogger({
     level: 'info',
     transports: [
         new winston.transports.Console({
-            format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
+            format: winston.format.combine(winston.format.colorize(), winston.format.simple(), winston.format.errors({ stack: true })),
         })
     ]
 });
 
 // REVIEW: 함수 위치 바꿔야할듯
-export function sendError(res: core.Response, e: unknown): void {
+export function sendError<T extends cloud.protocol.storage.Response>(res: core.Response<T>, e: unknown): void {
     logger.error(e);
 
     if (e instanceof Error) {
-        res.send({
-            result: {
-                successed: false,
-                message: e.message
+        res.status(500).send({
+            error: {
+                message: e.message,
             }
-        } as cloud.protocol.storage.GetResponse);
+        } as T);
     } else {
-        res.send({
-            result: {
-                successed: false,
+        res.status(500).send({
+            error: {
                 message: 'unknown error'
             }
-        } as cloud.protocol.storage.GetResponse);
+        } as T);
     }
 }
 

@@ -2,10 +2,11 @@ import * as core from 'express-serve-static-core';
 import { getLocation, createDirectory, createPendingFile, modifyMeta, deleteFile, renameFile } from '../core';
 import { sendError } from '~/src/logger';
 import { isString } from '../typguard';
+import { sleep } from '../test';
 
 export default function startAPIServer(app: core.Express) {
     // NOTE: storage api 서버
-    app.get(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
+    app.get<{}, cloud.protocol.storage.GetResponse, cloud.protocol.storage.GetRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
         const location = getLocation(req);
 
         try {
@@ -13,19 +14,18 @@ export default function startAPIServer(app: core.Express) {
                 return meta;
             });
 
-            res.send({
-                result: {
-                    successed: true
-                },
-                items: meta.items
-            } as cloud.protocol.storage.GetResponse);
+            
+
+            res.status(200).send({
+                items: meta.items,
+            });
 
         } catch (e) {
             sendError(res, e);
         }
     });
 
-    app.post(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
+    app.post<{}, cloud.protocol.storage.PostResponse, cloud.protocol.storage.PostRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
         const location = getLocation(req);
         const request = req.body as cloud.protocol.storage.PostRequest;
         const entity = request.entity;
@@ -33,27 +33,17 @@ export default function startAPIServer(app: core.Express) {
         try {
             if (entity.type === 'directory') {
                 await createDirectory(location, entity);
-                res.send({
-                    result: {
-                        successed: true
-                    }
-                } as cloud.protocol.storage.PostResponse);
+                res.status(200).send();
             } else if (entity.type === 'file') {
-                if (entity.state === 'pending') {
-                    await createPendingFile(location, entity);
-                    res.send({
-                        result: {
-                            successed: true
-                        }
-                    } as cloud.protocol.storage.PostResponse);
-                }
+                await createPendingFile(location, entity);
+                res.status(200).send();
             }
         } catch (e) {
             sendError(res, e);
         }
     });
 
-    app.delete(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
+    app.delete<{}, cloud.protocol.storage.DeleteResponse, cloud.protocol.storage.DeleteRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
         const location = getLocation(req);
         const request = req.body as cloud.protocol.storage.DeleteRequest;
         const filename = req.headers['filename'];
@@ -65,17 +55,13 @@ export default function startAPIServer(app: core.Express) {
             }
             
             await deleteFile(location, filename);
-            res.send({
-                result: {
-                    successed: true
-                }
-            } as cloud.protocol.storage.DeleteResponse);
+            res.status(200).send();
         } catch (e) {
             sendError(res, e);
         }
     });
     
-    app.put(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
+    app.put<{}, cloud.protocol.storage.PutResponse, cloud.protocol.storage.PutRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
         const location = getLocation(req);
         const request = req.body as cloud.protocol.storage.PutRequest;
         const entity = request.entity;
@@ -83,12 +69,7 @@ export default function startAPIServer(app: core.Express) {
         try {
             // TODO: 테스트하기
             await renameFile(location, entity, request.newFilename);
-
-            res.send({
-                result: {
-                    successed: true
-                }
-            } as cloud.protocol.storage.PutResponse);
+            res.status(200).send();
         } catch (e) {
             sendError(res, e);
         }

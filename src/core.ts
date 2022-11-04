@@ -21,11 +21,15 @@ export async function modifyMeta(location: cloud.Location, callback: (meta: clou
     };
 
     return new Promise(async (resolve, reject) => {
-        const meta = getMeta(location);
-        const newMeta = await callback(meta);
-        fs.writeFileSync(getAbsoluteMetaPath(location), JSON.stringify(newMeta, null, 4));
+        try {
+            const meta = getMeta(location);
+            const newMeta = await callback(meta);
+            fs.writeFileSync(getAbsoluteMetaPath(location), JSON.stringify(newMeta, null, 4));
 
-        resolve(newMeta);
+            resolve(newMeta);
+        } catch (e) {
+            reject(e);
+        }
     });
 }
 
@@ -69,6 +73,9 @@ export async function createDirectory(location: cloud.Location, entity: cloud.En
             throw new Error(`Not found. ${[location.scope, ...location.path].join('/')}`);
         }
 
+        if (fs.existsSync(path.resolve(absolutePath, entity.name))) {
+            throw new Error(`Already exists. ${[location.scope, ...location.path, entity.name].join('/')}`);
+        }
 
         fs.mkdirSync(path.resolve(absolutePath, entity.name, config.path.storage.contents.name), {
             recursive: true
@@ -98,7 +105,7 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
         if (!fs.existsSync(absolutePath)) {
             throw new Error(`No base directory found. ${[location.scope, ...location.path].join('/')}`);
         }
-        
+
         const file = meta.items.find((e) => e.name === entity.name);
         if (file !== undefined) {
             if (isFile(file)) {

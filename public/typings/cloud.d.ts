@@ -10,17 +10,18 @@ namespace cloud {
     interface Entity {
         type: cloud.EntityType;
         name: string;
-        state: cloud.FileState;
     }
 
     interface Directory extends cloud.Entity {
         createdTime: number;
+        state: cloud.FileState;
     }
 
     interface File extends cloud.Entity {
+        createdTime: number;
+        state: cloud.FileState;
         size: number;
         uploaded: number;
-        createdTime: number;
     }
 
     type Item = cloud.File | cloud.Directory;
@@ -30,45 +31,47 @@ namespace cloud {
     }
 
     namespace protocol {
-        interface Result {
-            successed: boolean;
+        interface Error {
             message?: string;
         }
 
         namespace storage {
+            interface Response {
+                error?: cloud.protocol.Error;
+            }
+            
             interface GetRequest {
                 
             }
 
-            interface GetResponse {
-                result: cloud.protocol.Result;
-                items?: cloud.Item[];
+            interface GetResponse extends Response {
+                items: cloud.Item[];
             }
             
             interface PostRequest {
                 entity: Entity;
             }
 
-            interface PostResponse {
-                result: cloud.protocol.Result;
-            }
-
-            interface DeleteRequest {
+            interface PostResponse extends Response {
                 
             }
-
-            interface DeleteResponse {
-                result: cloud.protocol.Result;
-            }
-
+            
             interface PutRequest {
                 type: cloud.EntityType;
                 entity: cloud.Entity;
                 newFilename: string;
             }
 
-            interface PutResponse {
-                result: cloud.protocol.Result;
+            interface PutResponse extends Response {
+
+            }
+
+            interface DeleteRequest {
+                
+            }
+
+            interface DeleteResponse extends Response {
+                
             }
         }
     }
