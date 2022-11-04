@@ -1,5 +1,5 @@
 import * as core from 'express-serve-static-core';
-import { getLocation, createDirectory, createPendingFile, modifyMeta, deleteFile, renameFile } from '../core';
+import { getLocation, createDirectory as createNormalDirectory, createPendingFile, modifyMeta, deleteFile, renameFile, createNormalFile } from '../core';
 import { sendError } from '~/src/logger';
 import { isString } from '../typguard';
 import { sleep } from '../test';
@@ -15,7 +15,7 @@ export default function startAPIServer(app: core.Express) {
             });
 
             await sleep(1000);
-            
+
 
             res.status(200).send({
                 items: meta.items,
@@ -33,10 +33,16 @@ export default function startAPIServer(app: core.Express) {
 
         try {
             if (entity.type === 'directory') {
-                await createDirectory(location, entity);
+                if (entity.state === 'normal') {
+                    await createNormalDirectory(location, entity);
+                }
                 res.status(200).send();
             } else if (entity.type === 'file') {
-                await createPendingFile(location, entity);
+                if (entity.state === 'pending') {
+                    await createPendingFile(location, entity);
+                } else if (entity.state === 'normal') {
+                    await createNormalFile(location, entity);
+                }
                 res.status(200).send();
             }
         } catch (e) {
@@ -54,14 +60,14 @@ export default function startAPIServer(app: core.Express) {
             if (!isString(filename)) {
                 throw new Error(`Invalid request. filename: ${filename}`);
             }
-            
+
             await deleteFile(location, filename);
             res.status(200).send();
         } catch (e) {
             sendError(res, e);
         }
     });
-    
+
     app.put<{}, cloud.protocol.storage.PutResponse, cloud.protocol.storage.PutRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
         const location = getLocation(req);
         const request = req.body as cloud.protocol.storage.PutRequest;

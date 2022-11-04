@@ -10,16 +10,15 @@ namespace cloud {
     interface Entity {
         type: cloud.EntityType;
         name: string;
+        state: cloud.FileState;
     }
 
     interface Directory extends cloud.Entity {
         createdTime: number;
-        state: cloud.FileState;
     }
 
     interface File extends cloud.Entity {
         createdTime: number;
-        state: cloud.FileState;
         size: number;
         uploaded: number;
     }
@@ -53,7 +52,7 @@ namespace cloud {
             }
 
             interface PostResponse extends Response {
-                
+
             }
             
             interface PutRequest {

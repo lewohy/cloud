@@ -48,7 +48,8 @@ export const FileList = (props: FileListProps) => {
             const result = await cr.post(`/api/storage/${[props.scope, ...props.path].join('/')}`, {
                 entity: {
                     type: 'directory',
-                    name
+                    name,
+                    state: 'normal'
                 }
             });
         } catch (error) {

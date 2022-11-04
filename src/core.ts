@@ -126,6 +126,32 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
     });
 }
 
+export async function createNormalFile(location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> {
+    return await modifyMeta(location, async (meta) => {
+        const absolutePath = getAbsoluteContentsPath(location);
+
+        if (!fs.existsSync(absolutePath)) {
+            throw new Error(`Not found base folder. ${[location.scope, ...location.path].join('/')}`);
+        }
+
+        if (fs.existsSync(path.resolve(absolutePath, entity.name))) {
+            throw new Error(`Already exists. ${[location.scope, ...location.path, entity.name].join('/')}`);
+        }
+
+        // create file
+        fs.writeFileSync(path.resolve(absolutePath, entity.name), '');
+
+        meta.items.push({
+            ...entity,
+            createdTime: dayjs().valueOf(),
+            size: 0,
+            uploaded: 0
+        } as cloud.File);
+
+        return meta;
+    });
+}
+
 export function deleteTempFile(location: cloud.Location, filename: string): void {
     const absolutePath = path.resolve(getAbsoluteTempPath(location), filename);
 
