@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import * as core from 'express-serve-static-core';
 import { commitFile, deleteTempFile, getLocation, modifyMeta, writeToTemp } from '../core';
 import { isFile, isNumber, isString } from '../typguard';
-import { sendError } from '~/src/logger';
+import logger, { sendError } from '~/src/logger';
 
 export default function startUploadServer(app: core.Express) {
     app.use('/upload', bodyParser.raw({
@@ -57,4 +57,6 @@ export default function startUploadServer(app: core.Express) {
             sendError(res, e);
         }
     });
+
+    logger.info('Upload server started.');
 }

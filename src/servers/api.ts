@@ -1,6 +1,6 @@
 import * as core from 'express-serve-static-core';
 import { getLocation, createDirectory as createNormalDirectory, createPendingFile, modifyMeta, deleteFile, renameFile, createNormalFile } from '../core';
-import { sendError } from '~/src/logger';
+import logger, { sendError } from '~/src/logger';
 import { isString } from '../typguard';
 import { sleep } from '../test';
 
@@ -81,4 +81,6 @@ export default function startAPIServer(app: core.Express) {
             sendError(res, e);
         }
     });
+
+    logger.info('API server started.');
 }
