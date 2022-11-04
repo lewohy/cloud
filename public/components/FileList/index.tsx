@@ -1,11 +1,15 @@
 import Stack from '@suid/material/Stack';
+import Typography from '@suid/material/Typography';
 import axios from 'axios';
+import { useDialogContainer as useSmulogContainer } from '~/public/dialogs/dialog';
+import promptDialog from '~/public/dialogs/PromptDialog';
 import path from 'path';
 import random from 'random';
 import { createEffect, createSignal, For } from 'solid-js';
 import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
+import cr from '~/public/ts/cr';
 
 export interface FileListProps {
     scope: string;
@@ -21,20 +25,36 @@ function createRandomNullArray(): Array<cloud.Item | null> {
 }
 
 export const FileList = (props: FileListProps) => {
-    const [itemList, setItemList] = createSignal<Array<cloud.Item | null>>(createRandomNullArray());
+    const [itemList, setItemList] = createSignal<cloud.Item[] | null>(null);
     const [uploadQueue, setUploadQueue] = createSignal<FileSystemFileEntry[]>([]);
+    const smulogContainer = useSmulogContainer();
 
     const refreshList = async () => {
-        setItemList(createRandomNullArray());
-        const result = await axios.get<cloud.protocol.storage.GetResponse>(`/api/storage/${[props.scope, ...props.path].join('/')}`);
-        const response = result.data;
+        setItemList(null);
+        try {
+            const response = await cr.get(`/api/storage/${[props.scope, ...props.path].join('/')}`);
 
-        if (response.result.successed) {
             if (response.items !== undefined) {
                 setItemList(response.items);
             }
+        } catch (error) {
+            // TODO: 요청 실패 처리하기
+            console.error(error);
         }
-        // TODO: 요청 실패 처리하기
+    };
+
+    const createFolder = async (name: string) => {
+        try {
+            const result = await cr.post(`/api/storage/${[props.scope, ...props.path].join('/')}`, {
+                entity: {
+                    type: 'directory',
+                    name
+                }
+            });
+        } catch (error) {
+            // TODO: 요청 실패 처리하기
+            console.error(error);
+        }
     };
 
     const addToPending = (entry: FileSystemEntry) => {
@@ -102,30 +122,29 @@ export const FileList = (props: FileListProps) => {
                 onUploadClick={() => {
                     // TODO: 파일 업로드
                 }}
-                onCreateFolderClick={() => {
+                onCreateFolderClick={async () => {
                     // TODO: 폴더 생성
+                    const result = await promptDialog.show(smulogContainer, {
+                        title: 'Create Folder'
+                    }, {
+                        message: '폴더 이름을 입력하세요.',
+                        label: 'New Folder'
+                    });
+
+                    if (result.response === 'positive') {
+                        if (result.returns !== undefined) {
+                            createFolder(result.returns.value);
+                        }
+                    }
                 }}
                 onCreateFileClick={() => {
                     // TOOD: 파일 생성
                 }} />
 
             {
-                props.path.length > 0 &&
-                <UpItem
-                    onClick={e => {
-                        props.onUpClick?.();
-                    }} />
-            }
-
-            {/*
-                TODO: 로딩 화면 구성하기
-                TODO: 새로고침 시 itemList초기화
-            */}
-
-            {
-                itemList() !== null &&
+                itemList() === null &&
                 <For
-                    each={itemList()}>
+                    each={createRandomNullArray()}>
                     {(item: cloud.Item | null) => (
                         <FileListItem
                             item={item}
@@ -136,6 +155,30 @@ export const FileList = (props: FileListProps) => {
                             }} />
                     )}
                 </For>
+            }
+            {
+                itemList() !== null &&
+                <>
+                    {
+                        props.path.length > 0 &&
+                        <UpItem
+                            onClick={e => {
+                                props.onUpClick?.();
+                            }} />
+                    }
+                    <For
+                        each={itemList()}>
+                        {(item: cloud.Item | null) => (
+                            <FileListItem
+                                item={item}
+                                onClick={e => {
+                                    if (item !== null) {
+                                        props.onItemClick?.(item);
+                                    }
+                                }} />
+                        )}
+                    </For>
+                </>
             }
 
         </Stack>

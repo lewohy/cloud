@@ -14,6 +14,7 @@ export default function startAPIServer(app: core.Express) {
                 return meta;
             });
 
+            await sleep(1000);
             
 
             res.status(200).send({

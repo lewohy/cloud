@@ -10,6 +10,8 @@ import Typography from '@suid/material/Typography';
 import { PathItem } from '~/public/components/PathItem';
 import { createEffect, createMemo, For } from 'solid-js';
 import { FileList } from '~/public/components/FileList';
+import { purple, grey } from '@suid/material/colors';
+import Modal from '@suid/material/Modal';
 
 type StorageParams = Record<'scope' | 'path', string>;
 
@@ -17,10 +19,14 @@ export interface StorageProps {
 
 }
 
+
 const theme = createTheme({
     palette: {
         background: {
             paper: '#ffffff'
+        },
+        primary: {
+            main: grey['500']
         }
     },
     typography: {
@@ -29,12 +35,12 @@ const theme = createTheme({
 });
 
 export const Storage = (props: StorageProps) => {
+
     const params = useParams<StorageParams>();
 
     const scope = createMemo(() => params.scope);
     const path = createMemo(() => params.path.length === 0 ? [] : params.path.split('/'));
     const navigate = useNavigate();
-    
 
     console.log(scope());
 
@@ -75,7 +81,7 @@ export const Storage = (props: StorageProps) => {
                         }}
                         onItemClick={item => {
                             navigate(`/storage/${scope()}/${path().concat(item.name).join('/')}`);
-                        }}/>
+                        }} />
                 </Stack>
             </Container>
         </ThemeProvider>

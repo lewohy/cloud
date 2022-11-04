@@ -2,11 +2,12 @@
 
 import Box from '@suid/material/Box';
 import Stack from '@suid/material/Stack';
+import Typography from '@suid/material/Typography';
 import { createComponent, createContext, createEffect, createSignal, For, JSX, useContext } from 'solid-js';
 
 interface Response<ReturnType> {
     response: 'positive' | 'negative';
-    returns: ReturnType;
+    returns?: ReturnType;
 }
 
 interface SmulogButtons {
@@ -21,7 +22,7 @@ interface SmulogData<ReturnType, Props> {
 }
 
 interface SmulogOption {
-    title?: () => JSX.Element;
+    title?: string;
     cancelOnTouchOutside?: boolean;
 }
 
@@ -33,6 +34,7 @@ interface SmulogContainerContext<ReturnType, Props> {
 interface SmulogContext<ReturnType> {
     setButtons(buttons: SmulogButtons): void;
     close(response: Response<ReturnType>): void;
+    close(): void;
 }
 
 const SmulogContainerContext = createContext<SmulogContainerContext<any, any>>();
@@ -106,8 +108,14 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                             backgroundColor: 'rgba(0, 0, 0, 0.5)',
                                         }}>
                                         <SmulogContext.Provider value={{
-                                            close: (response: Response<any>) => {
-                                                data.smulog.closeCall?.(response);
+                                            close: (response?: Response<any>) => {
+                                                if (response === undefined) {
+                                                    data.smulog.closeCall?.({
+                                                        response: 'negative'
+                                                    });
+                                                } else {
+                                                    data.smulog.closeCall?.(response);
+                                                }
                                             },
                                             setButtons: (buttons: SmulogButtons) => {
                                                 setButtons(buttons);
@@ -119,7 +127,7 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                     top: "50%",
                                                     left: "50%",
                                                     transform: "translate(-50%, -50%)",
-                                                    width: 400,
+                                                    minWidth: 540,
                                                     bgcolor: 'background.default',
                                                     boxShadow: "0px 0px 32px rgba(0,0,0,0.2)",
                                                     borderRadius: 1
@@ -134,8 +142,14 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                                 padding: '0px 24px'
                                                             }}>
 
-                                                            {createComponent(data.option.title, {})}
-
+                                                            <Typography
+                                                                variant="h6"
+                                                                sx={{
+                                                                    padding: '16px 0px'
+                                                                }}
+                                                                >
+                                                                {data.option.title}
+                                                            </Typography>
 
                                                         </Box>
                                                     }
