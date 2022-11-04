@@ -7,4 +7,9 @@ html, body {
     margin: 0px;
     padding: 0px;
     overflow: auto;
+    user-select: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
 }
