@@ -1,9 +1,8 @@
 import config from '~/config.json';
 import * as core from 'express-serve-static-core';
 import logger from '~/src/logger';
+import http from 'http';
 
-export default function startWebSocketServer(app: core.Express) {
-    const server = app.listen(config.port, () => {
-        logger.info(`WebSocket server is listening on port ${config.port}`);
-    });
+export default function startWebSocketServer(server: http.Server) {
+    
 }

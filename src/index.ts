@@ -9,6 +9,7 @@ import startWebServer from './servers/web';
 import startAPIServer from './servers/api';
 import startWebSocketServer from './servers/ws';
 import startUploadServer from './servers/upload';
+import logger from '~/src/logger';
 
 async function createServer() {
     const app = express();
@@ -27,10 +28,14 @@ async function createServer() {
     app.use('/api', express.json());
     app.set('etag', false);
 
+    const server = app.listen(config.port, () => {
+        logger.info(`Server is listening on port ${config.port}`);
+    });
+
     startUploadServer(app);
     startAPIServer(app);
     startWebServer(app);
-    startWebSocketServer(app);
+    startWebSocketServer(server);
 }
 
 createServer();
