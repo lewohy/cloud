@@ -144,7 +144,6 @@ export const FileList = (props: FileListProps) => {
                     // TODO: 파일 업로드
                 }}
                 onCreateFolderClick={async () => {
-                    // TODO: 폴더 생성
                     const result = await promptDialog.show(smulogContainer, {
                         title: 'Create Folder'
                     }, {
