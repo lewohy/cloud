@@ -12,5 +12,5 @@ export default function startWebServer(app: core.Express) {
         }).end(fs.readFileSync(path.resolve(process.cwd(), './public/storage.html'), 'utf-8'));
     });
 
-    logger.info('Web server started.');
+    logger.info('Web server ready.');
 }

@@ -82,5 +82,5 @@ export default function startAPIServer(app: core.Express) {
         }
     });
 
-    logger.info('API server started.');
+    logger.info('API server ready.');
 }

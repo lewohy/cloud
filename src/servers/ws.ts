@@ -17,5 +17,5 @@ export default function startWebSocketServer(server: http.Server) {
         });
     });
 
-    logger.info('WebSocket server started.');
+    logger.info('WebSocket server ready.');
 }

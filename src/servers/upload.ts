@@ -58,5 +58,5 @@ export default function startUploadServer(app: core.Express) {
         }
     });
 
-    logger.info('Upload server started.');
+    logger.info('Upload server ready.');
 }
