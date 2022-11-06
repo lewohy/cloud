@@ -12,6 +12,7 @@ import { createEffect, createMemo, For } from 'solid-js';
 import { FileList } from '~/public/components/FileList';
 import { purple, grey } from '@suid/material/colors';
 import Modal from '@suid/material/Modal';
+import { ScrollView } from '~/public/components/ScrollView';
 
 type StorageParams = Record<'scope' | 'path', string>;
 
@@ -46,44 +47,59 @@ export const Storage = (props: StorageProps) => {
     console.log(location().scope);
 
     return (
-        <ThemeProvider theme={theme}>
-            <Container maxWidth="md">
-                <Stack
+        <ThemeProvider
+            theme={theme}>
+            <ScrollView>
+                <Container
+                    maxWidth="md"
                     sx={{
-                        marginTop: '24px',
-                        marginLeft: '24px',
-                        marginRight: '24px'
+                        height: 'auto',
+                        minHeight: '100%',
+                        display: 'flex',
                     }}>
-                    <Stack>
-                        <Typography variant='h3'>{location().scope}</Typography>
+                    <Stack
+                        sx={{
+                            width: '100%',
+                            height: 'auto',
+                            minHeight: '100%',
+                            marginLeft: '24px',
+                            marginRight: '24px',
+                        }}>
+                        <Stack>
+                            <Typography variant='h3'>{location().scope}</Typography>
 
-                        <Breadcrumbs
+                            <Breadcrumbs
+                                sx={{
+                                    margin: '16px 0px',
+                                }}>
+                                <PathItem
+                                    href={`/storage/${location().scope}`}
+                                    text={location().scope} />
+                                <For each={location().path}>
+                                    {(item: string, index: () => number) => (
+                                        // TODO: 매우 길어진 경우에 처리하기
+                                        <PathItem
+                                            href={`/storage/${location().scope}/${location().path.slice(0, index() + 1).join('/')}`}
+                                            text={item} />
+                                    )}
+                                </For>
+                            </Breadcrumbs>
+                        </Stack>
+                        <FileList
                             sx={{
-                                margin: '16px 0px',
-                            }}>
-                            <PathItem
-                                href={`/storage/${location().scope}`}
-                                text={location().scope} />
-                            <For each={location().path}>
-                                {(item: string, index: () => number) => (
-                                    // TODO: 매우 길어진 경우에 처리하기
-                                    <PathItem
-                                        href={`/storage/${location().scope}/${location().path.slice(0, index() + 1).join('/')}`}
-                                        text={item} />
-                                )}
-                            </For>
-                        </Breadcrumbs>
+                                height: '100%',
+                                flexGrow: 1
+                            }}
+                            location={location()}
+                            onUpClick={() => {
+                                navigate(`/storage/${location().scope}/${location().path.slice(0, -1).join('/')}`);
+                            }}
+                            onItemClick={item => {
+                                navigate(`/storage/${location().scope}/${location().path.concat(item.name).join('/')}`);
+                            }} />
                     </Stack>
-                    <FileList
-                        location={location()}
-                        onUpClick={() => {
-                            navigate(`/storage/${location().scope}/${location().path.slice(0, -1).join('/')}`);
-                        }}
-                        onItemClick={item => {
-                            navigate(`/storage/${location().scope}/${location().path.concat(item.name).join('/')}`);
-                        }} />
-                </Stack>
-            </Container>
+                </Container>
+            </ScrollView>
         </ThemeProvider>
     );
 

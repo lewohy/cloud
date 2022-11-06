@@ -11,8 +11,11 @@ import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
 import cr from '~/public/ts/cr';
 import { io, Socket } from 'socket.io-client';
+import { SxProps } from "@suid/system";
+import { Theme } from "@suid/system/createTheme";
 
 export interface FileListProps {
+    sx?: SxProps<Theme>;
     location: cloud.Location;
     onUpClick?: () => void;
     onItemClick?: (item: cloud.Item) => void;
@@ -139,6 +142,7 @@ export const FileList = (props: FileListProps) => {
     });
 
     createEffect(() => {
+        // TODO: refresh일때는 skeleton 안보여주기
         socket()?.on('refresh', () => {
             refreshList();
         });
@@ -146,9 +150,7 @@ export const FileList = (props: FileListProps) => {
 
     return (
         <Stack
-            sx={{
-                height: '100%',
-            }}>
+            sx={props.sx}>
 
             <FunctionBar
                 onUploadClick={() => {
