@@ -10,7 +10,7 @@ import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
 import cr from '~/public/ts/cr';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 export interface FileListProps {
     location: cloud.Location;
@@ -28,9 +28,16 @@ export const FileList = (props: FileListProps) => {
     const [itemList, setItemList] = createSignal<cloud.Item[] | null>(null);
     const [uploadQueue, setUploadQueue] = createSignal<FileSystemFileEntry[]>([]);
     const smulogContainer = useSmulogContainer();
-    const socket = createMemo(() => io(location.origin, {
-        path: '/socket.io'
-    }));
+    const socket = createMemo<Socket | null>(prev => {
+        prev?.disconnect();
+
+        return io(location.origin, {
+            path: '/socket.io',
+            query: {
+                room: cr.getPathString(props.location)
+            }
+        })
+    }, null);
 
     const refreshList = async () => {
         setItemList(null);
@@ -129,8 +136,13 @@ export const FileList = (props: FileListProps) => {
 
     createEffect(() => {
         refreshList();
-        
-    }, []);
+    });
+
+    createEffect(() => {
+        socket()?.on('refresh', () => {
+            refreshList();
+        });
+    });
 
     return (
         <Stack

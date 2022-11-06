@@ -13,3 +13,7 @@ export function isFile(entity: cloud.Entity): entity is cloud.File {
 export function isDirectory(entity: cloud.Entity): entity is cloud.Directory {
     return entity.type === 'directory';
 }
+
+export function isSocketQuery(value: any): value is cloud.protocol.socketio.Query {
+    return value !== undefined && isString(value.room);
+}

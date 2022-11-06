@@ -39,8 +39,7 @@ declare global {
 
             namespace socketio {
                 interface Query {
-                    scope: string;
-                    path: string;
+                    room: string;
                 }
             }
 
