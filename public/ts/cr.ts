@@ -25,6 +25,10 @@ const cr = {
         } else {
             throw new Error(`Failed to get data from cloud. status: ${response.status}, message: ${response.data?.error?.message}`);
         }
+    },
+    // TODO: 함수 위치 바꾸기
+    getPathString(location: cloud.Location): string {
+        return [location.scope, ...location.path].join('/');
     }
 }
 

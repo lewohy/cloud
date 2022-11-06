@@ -13,8 +13,7 @@ import cr from '~/public/ts/cr';
 import { io } from 'socket.io-client';
 
 export interface FileListProps {
-    scope: string;
-    path: string[];
+    location: cloud.Location;
     onUpClick?: () => void;
     onItemClick?: (item: cloud.Item) => void;
 }
@@ -36,7 +35,7 @@ export const FileList = (props: FileListProps) => {
     const refreshList = async () => {
         setItemList(null);
         try {
-            const response = await cr.get(`/api/storage/${[props.scope, ...props.path].join('/')}`);
+            const response = await cr.get(`/api/storage/${cr.getPathString(props.location)}`);
 
             if (response.items !== undefined) {
                 setItemList(response.items);
@@ -49,7 +48,7 @@ export const FileList = (props: FileListProps) => {
 
     const createFolder = async (name: string) => {
         try {
-            const result = await cr.post(`/api/storage/${[props.scope, ...props.path].join('/')}`, {
+            const result = await cr.post(`/api/storage/${cr.getPathString(props.location) }`, {
                 entity: {
                     type: 'directory',
                     name,
@@ -64,7 +63,7 @@ export const FileList = (props: FileListProps) => {
 
     const createFile = async (name: string) => {
         try {
-            const result = await cr.post(`/api/storage/${[props.scope, ...props.path].join('/')}`, {
+            const result = await cr.post(`/api/storage/${cr.getPathString(props.location) }`, {
                 entity: {
                     type: 'file',
                     name,
@@ -191,7 +190,7 @@ export const FileList = (props: FileListProps) => {
                 itemList() !== null &&
                 <>
                     {
-                        props.path.length > 0 &&
+                        props.location.path.length > 0 &&
                         <UpItem
                             onClick={e => {
                                 props.onUpClick?.();

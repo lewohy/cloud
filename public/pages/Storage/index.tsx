@@ -37,12 +37,13 @@ const theme = createTheme({
 export const Storage = (props: StorageProps) => {
 
     const params = useParams<StorageParams>();
-
-    const scope = createMemo(() => params.scope);
-    const path = createMemo(() => params.path.length === 0 ? [] : params.path.split('/'));
+    const location = createMemo(() => ({
+        scope: params.scope,
+        path: params.path.length === 0 ? [] : params.path.split('/')
+    }));
     const navigate = useNavigate();
 
-    console.log(scope());
+    console.log(location().scope);
 
     return (
         <ThemeProvider theme={theme}>
@@ -54,33 +55,32 @@ export const Storage = (props: StorageProps) => {
                         marginRight: '24px'
                     }}>
                     <Stack>
-                        <Typography variant='h3'>{scope}</Typography>
+                        <Typography variant='h3'>{location().scope}</Typography>
 
                         <Breadcrumbs
                             sx={{
                                 margin: '16px 0px',
                             }}>
                             <PathItem
-                                href={`/storage/${scope()}`}
-                                text={scope()} />
-                            <For each={path()}>
+                                href={`/storage/${location().scope}`}
+                                text={location().scope} />
+                            <For each={location().path}>
                                 {(item: string, index: () => number) => (
                                     // TODO: 매우 길어진 경우에 처리하기
                                     <PathItem
-                                        href={`/storage/${scope()}/${path().slice(0, index() + 1).join('/')}`}
+                                        href={`/storage/${location().scope}/${location().path.slice(0, index() + 1).join('/')}`}
                                         text={item} />
                                 )}
                             </For>
                         </Breadcrumbs>
                     </Stack>
                     <FileList
-                        scope={scope()}
-                        path={path()}
+                        location={location()}
                         onUpClick={() => {
-                            navigate(`/storage/${scope()}/${path().slice(0, -1).join('/')}`);
+                            navigate(`/storage/${location().scope}/${location().path.slice(0, -1).join('/')}`);
                         }}
                         onItemClick={item => {
-                            navigate(`/storage/${scope()}/${path().concat(item.name).join('/')}`);
+                            navigate(`/storage/${location().scope}/${location().path.concat(item.name).join('/')}`);
                         }} />
                 </Stack>
             </Container>
