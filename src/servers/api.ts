@@ -1,8 +1,9 @@
 import * as core from 'express-serve-static-core';
-import { getLocation, createDirectory as createNormalDirectory, createPendingFile, modifyMeta, deleteFile, renameFile, createNormalFile } from '../core';
+import { getLocation, createDirectory as createNormalDirectory, createPendingFile, deleteFile, renameFile, createNormalFile } from '~/src/core';
 import logger, { sendError } from '~/src/logger';
-import { isString } from '../typguard';
+import { isString } from '~/src/typguard';
 import { sleep } from '../test';
+import { getMeta, modifyMeta } from '~/src/meta';
 
 export default function startAPIServer(app: core.Express) {
     // NOTE: storage api 서버
@@ -10,12 +11,7 @@ export default function startAPIServer(app: core.Express) {
         const location = getLocation(req);
 
         try {
-            const meta = await modifyMeta(location, async (meta) => {
-                return meta;
-            });
-
-            await sleep(1000);
-
+            const meta = await getMeta(location);
 
             res.status(200).send({
                 items: meta.items,

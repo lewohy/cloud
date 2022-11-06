@@ -4,34 +4,8 @@ import * as core from 'express-serve-static-core';
 import fs from 'fs';
 import path from 'path';
 import config from '~/config.json';
+import { getAbsoluteContentsPath, getAbsoluteTempPath, modifyMeta } from './meta';
 import { isFile } from './typguard';
-
-
-// TODO: 이 함수의 동기화 설정이 필요함
-// 절대로 이 함수의 callback은 동시에 두 번 이상 호출되어서는 안 됨
-export async function modifyMeta(location: cloud.Location, callback: (meta: cloud.Meta) => Promise<cloud.Meta>): Promise<cloud.Meta> {
-    const getMeta = (location: cloud.Location): cloud.Meta => {
-        const absolutePath = getAbsoluteMetaPath(location);
-
-        if (!fs.existsSync(absolutePath)) {
-            throw new Error(`Not found. ${[location.scope, ...location.path].join('/')}`);
-        }
-
-        return JSON.parse(fs.readFileSync(absolutePath, 'utf-8'));
-    };
-
-    return new Promise(async (resolve, reject) => {
-        try {
-            const meta = getMeta(location);
-            const newMeta = await callback(meta);
-            fs.writeFileSync(getAbsoluteMetaPath(location), JSON.stringify(newMeta, null, 4));
-
-            resolve(newMeta);
-        } catch (e) {
-            reject(e);
-        }
-    });
-}
 
 export function getLocation(req: core.Request): cloud.Location {
     const scope = req.params[0];
@@ -43,26 +17,8 @@ export function getLocation(req: core.Request): cloud.Location {
     };
 }
 
-export function getAbsoluteBasePath(location: cloud.Location): string {
-    const arr = [location.scope, ...location.path];
-
-    for (let i = 1; i < arr.length; i += 2) {
-        arr.splice(i, 0, config.path.storage.contents.name);
-    }
-
-    return path.resolve(config.path.storage.name, ...arr);
-}
-
-export function getAbsoluteContentsPath(location: cloud.Location): string {
-    return path.resolve(getAbsoluteBasePath(location), config.path.storage.contents.name);
-}
-
-export function getAbsoluteTempPath(location: cloud.Location): string {
-    return path.resolve(getAbsoluteBasePath(location), config.path.storage.temp.name);
-}
-
-export function getAbsoluteMetaPath(location: cloud.Location): string {
-    return path.resolve(getAbsoluteBasePath(location), config.path.storage.meta.name);
+export function getPathString(location: cloud.Location): string {
+    return [location.scope, ...location.path].join('/');
 }
 
 export async function createDirectory(location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> {
@@ -70,7 +26,7 @@ export async function createDirectory(location: cloud.Location, entity: cloud.En
         const absolutePath = getAbsoluteContentsPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`Not found base folder. ${[location.scope, ...location.path].join('/')}`);
+            throw new Error(`Not found base folder. ${getPathString(location)}`);
         }
 
         if (fs.existsSync(path.resolve(absolutePath, entity.name))) {
@@ -103,7 +59,7 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
         const absolutePath = getAbsoluteContentsPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`No base directory found. ${[location.scope, ...location.path].join('/')}`);
+            throw new Error(`No base directory found. ${getPathString(location)}`);
         }
 
         const file = meta.items.find((e) => e.name === entity.name);
@@ -111,7 +67,7 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
             if (isFile(file)) {
                 file.createdTime = dayjs().valueOf();
             } else {
-                throw new Error(`The entity is directory. ${[location.scope, ...location.path].join('/')}/${file.name}`);
+                throw new Error(`The entity is directory. ${getPathString(location)}/${file.name}`);
             }
         } else {
             meta.items.push({
@@ -131,7 +87,7 @@ export async function createNormalFile(location: cloud.Location, entity: cloud.E
         const absolutePath = getAbsoluteContentsPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`Not found base folder. ${[location.scope, ...location.path].join('/')}`);
+            throw new Error(`Not found base folder. ${getPathString(location)}`);
         }
 
         if (fs.existsSync(path.resolve(absolutePath, entity.name))) {
@@ -163,7 +119,7 @@ export function deleteTempFile(location: cloud.Location, filename: string): void
 export async function writeToTemp(location: cloud.Location, filename: string, data: Buffer): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
         if (meta.items.find((e) => e.name === filename) === undefined) {
-            throw new Error(`No meta found. ${[location.scope, ...location.path].join('/')}`);
+            throw new Error(`No meta found. ${getPathString(location)}`);
         }
 
         const absolutePath = getAbsoluteTempPath(location);
@@ -186,12 +142,12 @@ export async function deleteFile(location: cloud.Location, filename: string): Pr
         const absolutePath = getAbsoluteContentsPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`No entity found. ${[location.scope, ...location.path].join('/')}`);
+            throw new Error(`No entity found. ${getPathString(location)}`);
         }
 
         const file = meta.items.find((e) => e.name === filename);
         if (file === undefined) {
-            throw new Error(`No meta found. ${[location.scope, ...location.path].join('/')}/${filename}`);
+            throw new Error(`No meta found. ${getPathString(location)}/${filename}`);
         }
 
         fs.unlinkSync(path.resolve(absolutePath, filename));

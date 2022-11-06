@@ -1,9 +1,10 @@
 import bodyParser from 'body-parser';
 import dayjs from 'dayjs';
 import * as core from 'express-serve-static-core';
-import { commitFile, deleteTempFile, getLocation, modifyMeta, writeToTemp } from '../core';
-import { isFile, isNumber, isString } from '../typguard';
+import { commitFile, deleteTempFile, getLocation, writeToTemp } from '~/src/core';
+import { isFile, isNumber, isString } from '~/src/typguard';
 import logger, { sendError } from '~/src/logger';
+import { modifyMeta } from '~/src/meta';
 
 export default function startUploadServer(app: core.Express) {
     app.use('/upload', bodyParser.raw({
