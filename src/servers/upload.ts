@@ -16,7 +16,10 @@ export default function startUploadServer(app: core.Express) {
             const location = getLocation(req);
 
             const size = parseInt(req.headers['content-length'] ?? '');
-            const filename = req.headers['filename'];
+            const filename = (() => {
+                const encoded = req.headers['filename'];
+                return isString(encoded) ? decodeURI(encoded) : undefined;
+            })();
 
             if (!isNumber(size) || !isString(filename)) {
                 throw new Error(`Invalid request. size: ${size}, filename: ${filename}`);
@@ -47,6 +50,7 @@ export default function startUploadServer(app: core.Express) {
 
             req.on('data', async (chunk: Buffer) => {
                 current += chunk.length;
+                logger.info(`uploading... ${current}/${size}`);
                 await writeToTemp(location, filename, chunk);
             }).on('end', async () => {
                 await commitFile(location, filename);

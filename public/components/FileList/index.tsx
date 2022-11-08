@@ -3,7 +3,6 @@ import Typography from '@suid/material/Typography';
 import axios from 'axios';
 import { useDialogContainer as useSmulogContainer } from '~/public/dialogs/dialog';
 import promptDialog from '~/public/dialogs/PromptDialog';
-import path from 'path';
 import random from 'random';
 import { createEffect, createMemo, createSignal, For } from 'solid-js';
 import { FileListItem } from './FileListItem';
@@ -13,6 +12,7 @@ import cr from '~/public/ts/cr';
 import { io, Socket } from 'socket.io-client';
 import { SxProps } from "@suid/system";
 import { Theme } from "@suid/system/createTheme";
+import { isDirectory, isFile } from '~/public/ts/typeguard';
 
 export interface FileListProps {
     sx?: SxProps<Theme>;
@@ -29,7 +29,6 @@ function createRandomNullArray(): Array<cloud.Item | null> {
 
 export const FileList = (props: FileListProps) => {
     const [itemList, setItemList] = createSignal<cloud.Item[] | null>(null);
-    const [uploadQueue, setUploadQueue] = createSignal<FileSystemFileEntry[]>([]);
     const smulogContainer = useSmulogContainer();
     const socket = createMemo<Socket | null>(prev => {
         prev?.disconnect();
@@ -42,8 +41,10 @@ export const FileList = (props: FileListProps) => {
         })
     }, null);
 
-    const refreshList = async () => {
-        setItemList(null);
+    const refreshList = async (reload: boolean) => {
+        if (reload) {
+            setItemList(null);
+        }
         try {
             const response = await cr.get(`/api/storage/${cr.getPathString(props.location)}`);
 
@@ -58,7 +59,7 @@ export const FileList = (props: FileListProps) => {
 
     const createFolder = async (name: string) => {
         try {
-            const result = await cr.post(`/api/storage/${cr.getPathString(props.location) }`, {
+            const result = await cr.post(`/api/storage/${cr.getPathString(props.location)}`, {
                 entity: {
                     type: 'directory',
                     name,
@@ -73,7 +74,7 @@ export const FileList = (props: FileListProps) => {
 
     const createFile = async (name: string) => {
         try {
-            const result = await cr.post(`/api/storage/${cr.getPathString(props.location) }`, {
+            const result = await cr.post(`/api/storage/${cr.getPathString(props.location)}`, {
                 entity: {
                     type: 'file',
                     name,
@@ -86,21 +87,45 @@ export const FileList = (props: FileListProps) => {
         }
     };
 
-    const addToPending = (entry: FileSystemEntry) => {
-        if (entry.isDirectory) {
-            const directoryEntry = entry as FileSystemDirectoryEntry;
+    const getFileEntryList = (entry: FileSystemEntry): Promise<FileSystemFileEntry[]> => {
+        return new Promise((resolve, reject) => {
 
-            directoryEntry.createReader().readEntries((entries) => {
-                (entry as FileSystemDirectoryEntry).createReader().readEntries((entries) => {
-                    entries.forEach(addToPending);
-                });
-            });
+            if (isFile(entry)) {
+                resolve([entry]);
+            } else if (isDirectory(entry)) {
+                const reader = entry.createReader();
 
-        } else if (entry.isFile) {
-            const fileEntry = entry as FileSystemFileEntry;
-            // TODO: 중복 처리
-            setUploadQueue([...uploadQueue(), fileEntry]);
+                reader.readEntries(async (entries) => {
+                    const fileEntryList = await Promise.all(entries.map(getFileEntryList));
+
+                    resolve(fileEntryList.flat());
+                }, reject);
+            }
+        });
+    };
+
+    const getItemMeta = async (fileEntry: FileSystemFileEntry): Promise<cloud.Item | undefined> => {
+        try {
+            const meta = await cr.get(`/api/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`);
+
+            return meta.items.find(item => item.name === fileEntry.name);
+        } catch (error) {
+            return undefined;
         }
+    };
+
+    const getDuplicateFileList = async (entryList: FileSystemFileEntry[]): Promise<cloud.Item[]> => {
+        const duplicated = (await Promise.all(entryList.map(getItemMeta))).filter(item => item !== undefined) as cloud.Item[];
+
+        return duplicated;
+    };
+
+    const getParentEntry = (entry: FileSystemEntry): Promise<FileSystemDirectoryEntry> => {
+        return new Promise((resolve, reject) => {
+            entry.getParent(entry => {
+                resolve(entry as FileSystemDirectoryEntry);
+            }, reject);
+        });
     };
 
     const init = () => {
@@ -110,14 +135,26 @@ export const FileList = (props: FileListProps) => {
             const items = e.dataTransfer?.items;
 
             if (items !== undefined) {
-                for (let i = 0; i < items.length ?? 0; i++) {
-                    const item = items[i];
-                    const file = item.getAsFile();
-                    const entry = item.webkitGetAsEntry();
+                const entryList = (await Promise.all(Array.from(items).map(item => item.webkitGetAsEntry()))).filter(entry => entry !== null) as FileSystemEntry[];
+                const fileEntryList = (await Promise.all(entryList.map(getFileEntryList))).flat();
+                const duplicated = await getDuplicateFileList(fileEntryList);
 
-                    if (entry !== null) {
-                        addToPending(entry);
-                    }
+                fileEntryList.forEach(e => {
+                    console.log(e.fullPath);
+                })
+
+                if (duplicated.length === 0) {
+                    fileEntryList.forEach(async fileEntry => {
+                        cr.post(`/api/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, {
+                            entity: {
+                                type: 'file',
+                                name: fileEntry.name,
+                                state: 'pending'
+                            }
+                        });
+
+                        cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
+                    });
                 }
             }
         });
@@ -138,13 +175,13 @@ export const FileList = (props: FileListProps) => {
     init();
 
     createEffect(() => {
-        refreshList();
+        refreshList(true);
     });
 
     createEffect(() => {
         // TODO: refresh일때는 skeleton 안보여주기
         socket()?.on('refresh', () => {
-            refreshList();
+            refreshList(false);
         });
     });
 
