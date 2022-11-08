@@ -19,7 +19,7 @@ export function getMeta(location: cloud.Location): cloud.Meta {
     const absolutePath = getAbsoluteMetaPath(location);
 
     if (!fs.existsSync(absolutePath)) {
-        throw new Error(`Not found. ${getPathString(location)}`);
+        throw new Error(`Cannot Not found meta base folder. ${getPathString(location)}`);
     }
 
     return JSON.parse(fs.readFileSync(absolutePath, 'utf-8'));
