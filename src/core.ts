@@ -4,6 +4,7 @@ import * as core from 'express-serve-static-core';
 import fs from 'fs';
 import path from 'path';
 import config from '~/config.json';
+import logger from './logger';
 import { getAbsoluteContentsPath, getAbsoluteTempPath, modifyMeta } from './meta';
 import { isFile } from './typguard';
 
@@ -21,48 +22,88 @@ export function getPathString(location: cloud.Location): string {
     return [location.scope, ...location.path].join('/');
 }
 
-export async function createDirectory(location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> {
-    return await modifyMeta(location, async (meta) => {
-        const absolutePath = getAbsoluteContentsPath(location);
+export async function createNormalDirectory(location: cloud.Location, entity: cloud.Entity): Promise<void> {
+    const create = async (location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> => {
+        return await modifyMeta(location, async (meta) => {
+            const absolutePath = getAbsoluteContentsPath(location);
 
-        if (!fs.existsSync(absolutePath)) {
-            throw new Error(`Not found base folder. ${getPathString(location)}`);
-        }
+            if (!fs.existsSync(absolutePath)) {
+                throw new Error(`No base directory found. ${getPathString(location)}`);
+            }
 
-        if (fs.existsSync(path.resolve(absolutePath, entity.name))) {
-            throw new Error(`Already exists. ${[location.scope, ...location.path, entity.name].join('/')}`);
-        }
+            if (fs.existsSync(path.resolve(absolutePath, entity.name))) {
+                throw new Error(`Already exists. ${[location.scope, ...location.path, entity.name].join('/')}`);
+            }
 
-        fs.mkdirSync(path.resolve(absolutePath, entity.name, config.path.storage.contents.name), {
-            recursive: true
+            fs.mkdirSync(path.resolve(absolutePath, entity.name, config.path.storage.contents.name), {
+                recursive: true
+            });
+
+            fs.mkdirSync(path.resolve(absolutePath, entity.name, config.path.storage.temp.name), {
+                recursive: true
+            });
+
+            fs.writeFileSync(path.resolve(absolutePath, entity.name, config.path.storage.meta.name), JSON.stringify({
+                items: []
+            } as cloud.Meta, null, 4));
+
+            meta.items.push({
+                ...entity,
+                createdTime: dayjs().valueOf()
+            } as cloud.Directory);
+
+            return meta;
         });
+    };
 
-        fs.mkdirSync(path.resolve(absolutePath, entity.name, config.path.storage.temp.name), {
-            recursive: true
-        });
+    const paths = [...location.path, entity.name];
 
-        fs.writeFileSync(path.resolve(absolutePath, entity.name, config.path.storage.meta.name), JSON.stringify({
-            items: []
-        } as cloud.Meta, null, 4));
+    for (let i = 0; i < paths.length; i++) {
+        logger.info(`Creating directory. ${[location.scope, ...paths.slice(0, i + 1)].join('/')}`);
+        try {
+            await create({
+                scope: location.scope,
+                path: paths.slice(0, i)
+            }, {
+                type: 'directory',
+                name: paths[i],
+                state: 'normal'
+            });
 
-        meta.items.push({
-            ...entity,
-            createdTime: dayjs().valueOf()
-        } as cloud.Directory);
-
-        return meta;
-    });
+            logger.info(`Directory ${[location.scope, ...paths.slice(0, i + 1)].join('/')} created.`);
+        } catch (e) {
+            logger.warn(`Directory already exists. ${[location.scope, ...paths.slice(0, i + 1)].join('/')}`);
+        }
+    }
 }
 
 export async function createPendingFile(location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> {
-    return await modifyMeta(location, async (meta) => {
-        const absolutePath = getAbsoluteContentsPath(location);
+    if (location.path.length > 0) {
+        await createNormalDirectory({
+            scope: location.scope,
+            path: location.path.slice(0, -1)
+        }, {
+            type: 'directory',
+            name: location.path[location.path.length - 1],
+            state: 'normal'
+        });
+    }
 
-        if (!fs.existsSync(absolutePath)) {
+    return await modifyMeta(location, async (meta) => {
+        const absoluteContentsPath = getAbsoluteContentsPath(location);
+        const absoluteTempPath = getAbsoluteTempPath(location);
+
+        if (!fs.existsSync(absoluteContentsPath)) {
             throw new Error(`No base directory found. ${getPathString(location)}`);
         }
 
+        logger.info(`Creating pending file. ${getPathString(location)}/${entity.name}`);
+
+        // create file
+        fs.writeFileSync(path.resolve(absoluteTempPath, entity.name), '');
+
         const file = meta.items.find((e) => e.name === entity.name);
+
         if (file !== undefined) {
             if (isFile(file)) {
                 file.createdTime = dayjs().valueOf();
@@ -83,11 +124,22 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
 }
 
 export async function createNormalFile(location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> {
+    if (location.path.length > 0) {
+        await createNormalDirectory({
+            scope: location.scope,
+            path: location.path.slice(0, -1)
+        }, {
+            type: 'directory',
+            name: location.path[location.path.length - 1],
+            state: 'normal'
+        });
+    }
+
     return await modifyMeta(location, async (meta) => {
         const absolutePath = getAbsoluteContentsPath(location);
 
         if (!fs.existsSync(absolutePath)) {
-            throw new Error(`Not found base folder. ${getPathString(location)}`);
+            throw new Error(`No base directory found. ${getPathString(location)}`);
         }
 
         if (fs.existsSync(path.resolve(absolutePath, entity.name))) {
@@ -185,8 +237,10 @@ export async function commitFile(location: cloud.Location, filename: string): Pr
         const absoluteTempPath = path.resolve(getAbsoluteTempPath(location), filename);
         const absoluteContentsPath = path.resolve(getAbsoluteContentsPath(location), filename);
 
+        logger.info(`Commit file. ${absoluteTempPath} -> ${absoluteContentsPath}`);
+
         if (!fs.existsSync(absoluteTempPath)) {
-            throw new Error(`Not found. ${location.scope}/${location.path.join('/')}`);
+            throw new Error(`Not found temp path. ${location.scope}/${location.path.join('/')}`);
         }
 
         if (fs.statSync(absoluteTempPath).isDirectory()) {

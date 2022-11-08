@@ -43,8 +43,6 @@ export default function startUploadServer(app: core.Express) {
                 return meta;
             });
 
-            deleteTempFile(location, filename);
-
             let current = 0;
 
             req.on('data', async (chunk: Buffer) => {
