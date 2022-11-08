@@ -81,6 +81,12 @@ declare global {
                 interface DeleteResponse extends Response {
 
                 }
+                
+                type UploadRequest = globalThis.File;
+
+                interface UploadResponse extends Response {
+
+                }
             }
         }
     }
