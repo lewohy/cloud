@@ -5,37 +5,34 @@ import { createEffect, createMemo, createSignal, JSX } from 'solid-js';
 export interface ScrollViewProps {
     children: JSX.Element;
     /**
-     * @default 10
+     * @default 7
      */
     width?: number;
     /**
-     * @default 10
+     * @default 8
      */
     minThumbHeightRatio?: number;
 
 }
 
+// TODO: 스크롤바의 최소 크기 설정하기
 export const ScrollView = (props: ScrollViewProps) => {
     const theme = useTheme();
 
     const [view, setView] = createSignal<HTMLDivElement | null>(null);
     const [content, setContent] = createSignal<HTMLDivElement | null>(null);
+    const [thumb, setThumb] = createSignal<HTMLDivElement | null>(null);
 
     const [viewHeight, setViewHeight] = createSignal(0);
     const [contentHeight, setContentHeight] = createSignal(0);
     const [padding, setPadding] = createSignal(5);
     const [scroll, setScroll] = createSignal(0);
-    const width = createMemo(() => props.width ?? 10);
-    const minThumbHeightRatio = createMemo(() => props.minThumbHeightRatio ?? 10);
+    const width = createMemo(() => props.width ?? 7);
 
     const scrollBarHeight = createMemo(() => viewHeight() - padding() * 2);
-    const thumbHeight = createMemo(() => viewHeight() / contentHeight() * scrollBarHeight());
+    const thumbHeight = createMemo(() => Math.min(scrollBarHeight(), viewHeight() / contentHeight() * scrollBarHeight()));
 
     createEffect(() => {
-        console.log(view());
-        console.log(content());
-        console.log(viewHeight(), contentHeight());
-
         if (view() !== null) {
             new ResizeObserver(e => {
                 e.forEach(entry => {
@@ -55,6 +52,7 @@ export const ScrollView = (props: ScrollViewProps) => {
 
     return (
         <Box
+            ref={setView}
             sx={{
                 width: '100%',
                 height: '100%',
@@ -64,12 +62,8 @@ export const ScrollView = (props: ScrollViewProps) => {
                 }
             }}
             onScroll={e => {
-                console.log('s', scroll());
-                console.log('c', contentHeight());
-                console.log('b', scrollBarHeight());
                 setScroll(view()?.scrollTop ?? 0);
-            }}
-            ref={setView}>
+            }}>
             <Box
                 ref={setContent}>
                 {
@@ -95,13 +89,14 @@ export const ScrollView = (props: ScrollViewProps) => {
                         overflow: 'hidden'
                     }}>
                     <Box
+                        ref={setThumb}
                         sx={{
                             width: width(),
                             height: `${thumbHeight()}px`,
-                            background: theme.palette.primary.main,
+                            background: theme.palette.secondary.main,
                             borderRadius: width() / 2,
                             marginTop: `${scroll() / contentHeight() * scrollBarHeight()}px`,
-                            transition: 'height 0.2s linear, margin-top 0.1s linear'
+                            transition: 'height 0.2s ease-in-out'
                         }} />
                 </Box>
             </Box>
