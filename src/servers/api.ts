@@ -1,9 +1,9 @@
 import * as core from 'express-serve-static-core';
-import { getLocation, createDirectory as createNormalDirectory, createPendingFile, deleteFile, renameFile, createNormalFile } from '~/src/core';
+import { getLocation, createNormalDirectory, createPendingFile, deleteFile, renameFile, createNormalFile } from '~/src/core';
 import logger, { sendError } from '~/src/logger';
 import { isString } from '~/src/typguard';
 import { sleep } from '../test';
-import { getMeta, modifyMeta } from '~/src/meta';
+import { getMeta } from '~/src/meta';
 
 export default function startAPIServer(app: core.Express) {
     // NOTE: storage api 서버
@@ -11,10 +11,10 @@ export default function startAPIServer(app: core.Express) {
         const location = getLocation(req);
 
         try {
-            const meta = await getMeta(location);
+            const meta = getMeta(location);
 
             res.status(200).send({
-                items: meta.items,
+                items: meta.items
             });
 
         } catch (e) {
@@ -32,6 +32,7 @@ export default function startAPIServer(app: core.Express) {
                 if (entity.state === 'normal') {
                     await createNormalDirectory(location, entity);
                 }
+
                 res.status(200).send();
             } else if (entity.type === 'file') {
                 if (entity.state === 'pending') {
@@ -39,6 +40,7 @@ export default function startAPIServer(app: core.Express) {
                 } else if (entity.state === 'normal') {
                     await createNormalFile(location, entity);
                 }
+
                 res.status(200).send();
             }
         } catch (e) {

@@ -10,7 +10,7 @@ import Typography from '@suid/material/Typography';
 import { PathItem } from '~/public/components/PathItem';
 import { createEffect, createMemo, For } from 'solid-js';
 import { FileList } from '~/public/components/FileList';
-import { purple, grey } from '@suid/material/colors';
+import { purple, grey, blue } from '@suid/material/colors';
 import Modal from '@suid/material/Modal';
 import { ScrollView } from '~/public/components/ScrollView';
 
@@ -28,6 +28,9 @@ const theme = createTheme({
         },
         primary: {
             main: grey['500']
+        },
+        secondary: {
+            main: blue['400']
         }
     },
     typography: {
