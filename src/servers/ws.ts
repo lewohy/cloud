@@ -31,7 +31,7 @@ export default function startWebSocketServer(server: http.Server) {
 
     observeMeta(modification => {
         const targetRoom = getPathString(modification.location);
-        logger.info(`Sending modification to room ${targetRoom}.`);
+        // logger.info(`Sending modification to room ${targetRoom}.`);
         io.to(targetRoom).emit('refresh');
     }); 
 

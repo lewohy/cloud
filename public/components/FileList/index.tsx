@@ -12,7 +12,7 @@ import cr from '~/public/ts/cr';
 import { io, Socket } from 'socket.io-client';
 import { SxProps } from "@suid/system";
 import { Theme } from "@suid/system/createTheme";
-import { isDirectory, isFile } from '~/public/ts/typeguard';
+import { isDirectoryEntry, isFileEntry } from '~/public/ts/typeguard';
 
 export interface FileListProps {
     sx?: SxProps<Theme>;
@@ -90,9 +90,9 @@ export const FileList = (props: FileListProps) => {
     const getFileEntryList = (entry: FileSystemEntry): Promise<FileSystemFileEntry[]> => {
         return new Promise((resolve, reject) => {
 
-            if (isFile(entry)) {
+            if (isFileEntry(entry)) {
                 resolve([entry]);
-            } else if (isDirectory(entry)) {
+            } else if (isDirectoryEntry(entry)) {
                 const reader = entry.createReader();
 
                 reader.readEntries(async (entries) => {

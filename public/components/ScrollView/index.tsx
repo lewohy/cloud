@@ -82,19 +82,19 @@ export const ScrollView = (props: ScrollViewProps) => {
                 }}>
                 <Box
                     sx={{
-                        width: width(),
-                        height: scrollBarHeight(),
+                        width: `${width()}px`,
+                        height: `${scrollBarHeight()}px`,
                         background: 'rgba(0, 0, 0, 0.1)',
-                        borderRadius: width() / 2,
+                        borderRadius: `${width() / 2}px`,
                         overflow: 'hidden'
                     }}>
                     <Box
                         ref={setThumb}
                         sx={{
-                            width: width(),
+                            width: `${width()}px`,
                             height: `${thumbHeight()}px`,
                             background: theme.palette.secondary.main,
-                            borderRadius: width() / 2,
+                            borderRadius: `${width() / 2}px`,
                             marginTop: `${scroll() / contentHeight() * scrollBarHeight()}px`,
                             transition: 'height 0.2s ease-in-out'
                         }} />

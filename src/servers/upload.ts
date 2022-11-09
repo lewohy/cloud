@@ -50,7 +50,7 @@ export default function startUploadServer(app: core.Express) {
 
             req.on('data', async (chunk: Buffer) => {
                 current += chunk.length;
-                logger.info(`uploading... ${current}/${size}`);
+                // logger.info(`uploading... ${current}/${size}`);
                 await writeToTemp(location, filename, chunk);
             }).on('end', async () => {
                 await commitFile(location, filename);
