@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useDialogContainer as useSmulogContainer } from '~/public/dialogs/dialog';
 import promptDialog from '~/public/dialogs/PromptDialog';
 import random from 'random';
-import { createEffect, createMemo, createSignal, For } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, Match, Show, Switch } from 'solid-js';
 import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
@@ -49,7 +49,30 @@ export const FileList = (props: FileListProps) => {
             const response = await cr.get(`/api/storage/${cr.getPathString(props.location)}`);
 
             if (response.items !== undefined) {
-                setItemList(response.items);
+                const origin = [...itemList() ?? []];
+
+                response.items.forEach(item => {
+                    const index = origin.findIndex(e => e.name === item.name);
+
+                    if (index === -1) {
+                        origin.push(item);
+                    } else {
+                        const keys = Object.keys(item) as (keyof cloud.Item)[];
+                        console.log(item.name);
+                        // if (!keys.every(key => item[key] === origin[index][key])) {
+                        //     console.log('refres', item.name);
+                        //     origin[index] = item;                            
+                        // }
+
+                        keys.forEach(key => {
+                            item[key] !== origin[index][key];
+                        });
+                    }
+                });
+
+                console.log(origin);
+
+                setItemList(origin);
             }
         } catch (error) {
             // TODO: 요청 실패 처리하기
@@ -222,33 +245,10 @@ export const FileList = (props: FileListProps) => {
                     }
                 }} />
 
-            {
-                itemList() === null &&
-                <For
-                    each={createRandomNullArray()}>
-                    {(item: cloud.Item | null) => (
-                        <FileListItem
-                            item={item}
-                            onClick={e => {
-                                if (item !== null) {
-                                    props.onItemClick?.(item);
-                                }
-                            }} />
-                    )}
-                </For>
-            }
-            {
-                itemList() !== null &&
-                <>
-                    {
-                        props.location.path.length > 0 &&
-                        <UpItem
-                            onClick={e => {
-                                props.onUpClick?.();
-                            }} />
-                    }
+            <Switch
+                fallback={
                     <For
-                        each={itemList()}>
+                        each={createRandomNullArray()}>
                         {(item: cloud.Item | null) => (
                             <FileListItem
                                 item={item}
@@ -259,9 +259,33 @@ export const FileList = (props: FileListProps) => {
                                 }} />
                         )}
                     </For>
-                </>
-            }
-
+                }>
+                <Match
+                    when={itemList() !== null}>
+                    <Show
+                        when={props.location.path.length > 0}>
+                        <UpItem
+                            onClick={e => {
+                                props.onUpClick?.();
+                            }} />
+                    </Show>
+                    <For
+                        each={itemList()}>
+                        {(item, index) => {
+                            console.log(index());
+                            return (
+                                <FileListItem
+                                    item={item}
+                                    onClick={e => {
+                                        if (item !== null) {
+                                            props.onItemClick?.(item);
+                                        }
+                                    }} />
+                            );
+                        }}
+                    </For>
+                </Match>
+            </Switch>
         </Stack>
     );
 };
