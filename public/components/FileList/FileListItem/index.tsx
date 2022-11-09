@@ -8,16 +8,22 @@ import Skeleton from '@suid/material/Skeleton';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import dayjs from 'dayjs';
-import { JSX, Match, Switch } from 'solid-js';
+import { createMemo, JSX, Match, Switch } from 'solid-js';
 import { isFile, isFileEntry } from '~/public/ts/typeguard';
 import { RippleBase, RippleBaseProps } from '~/public/components/RippleBase';
+import { useFileList } from '..';
 
 export interface FileListItemProps {
-    item?: cloud.Item | null;
+    name: string | null;
     onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
 }
 
 export const FileListItem = (props: FileListItemProps) => {
+    const fileList = useFileList();
+    const item = createMemo(() => {
+        return fileList.getItem(props.name);
+    });
+
     const getUploadProgress = (item?: cloud.Item | null) => {
         if (isFile(item)) {
             return item.uploaded / item.size * 100;
@@ -60,7 +66,7 @@ export const FileListItem = (props: FileListItemProps) => {
                                 }} />
                         }>
                         <Match
-                            when={props.item?.type === 'directory'}>
+                            when={item()?.type === 'directory'}>
                             <FolderOutlined
                                 sx={{
                                     fontSize: '48px'
@@ -68,7 +74,7 @@ export const FileListItem = (props: FileListItemProps) => {
                         </Match>
 
                         <Match
-                            when={props.item?.type === 'file'}>
+                            when={item()?.type === 'file'}>
                             <InsertDriveFile
                                 sx={{
                                     fontSize: '48px'
@@ -100,8 +106,8 @@ export const FileListItem = (props: FileListItemProps) => {
                                     variant="text" />
                             }>
                             <Match
-                                when={props.item?.name !== undefined}>
-                                {props.item?.name}
+                                when={item()?.name !== undefined}>
+                                {item()?.name}
                             </Match>
                         </Switch>
                     </Typography>
@@ -122,11 +128,11 @@ export const FileListItem = (props: FileListItemProps) => {
                                     variant="text" />
                             }>
                             <Match
-                                when={props.item?.state === 'normal'}>
-                                {dayjs(props.item?.createdTime).format('YYYY-MM-DD HH:mm:ss')}
+                                when={item()?.state === 'normal'}>
+                                {dayjs(item()?.createdTime).format('YYYY-MM-DD HH:mm:ss')}
                             </Match>
                             <Match
-                                when={props.item?.state === 'uploading'}>
+                                when={item()?.state === 'uploading'}>
                                 <Box
                                     sx={{
                                         width: '100%',
@@ -139,7 +145,8 @@ export const FileListItem = (props: FileListItemProps) => {
                                             width: '100%',
                                         }}
                                         variant="determinate"
-                                        value={getUploadProgress(props.item)} />
+                                        color='secondary'
+                                        value={getUploadProgress(item())} />
                                 </Box>
                             </Match>
                         </Switch>

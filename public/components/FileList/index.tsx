@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useDialogContainer as useSmulogContainer } from '~/public/dialogs/dialog';
 import promptDialog from '~/public/dialogs/PromptDialog';
 import random from 'random';
-import { createEffect, createMemo, createSignal, For, Match, Show, Switch } from 'solid-js';
+import { createContext, createEffect, createMemo, createSignal, For, Match, Show, Switch, useContext } from 'solid-js';
 import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
@@ -14,6 +14,13 @@ import { SxProps } from "@suid/system";
 import { Theme } from "@suid/system/createTheme";
 import { isDirectoryEntry, isFileEntry } from '~/public/ts/typeguard';
 
+
+interface FileListContext {
+    getItem(name: string | null): cloud.Item | undefined;
+}
+
+const FileListContext = createContext<FileListContext>();
+
 export interface FileListProps {
     sx?: SxProps<Theme>;
     location: cloud.Location;
@@ -21,14 +28,28 @@ export interface FileListProps {
     onItemClick?: (item: cloud.Item) => void;
 }
 
-function createRandomNullArray(): Array<cloud.Item | null> {
+function createRandomNullArray(): null[] {
     return Array.from({
         length: random.int(5, 10)
     }, () => null);
 }
 
+export function useFileList(): FileListContext {
+    const context = useContext(FileListContext);
+
+    if (context === undefined) {
+        throw new Error('Component must be used within a FileList.');
+    }
+
+    return context;
+}
+
 export const FileList = (props: FileListProps) => {
     const [itemList, setItemList] = createSignal<cloud.Item[] | null>(null);
+    const itemNameList = createMemo<string[] | null>((prev) => {
+        return itemList()?.map((item) => item.name) ?? null;
+    });
+
     const smulogContainer = useSmulogContainer();
     const socket = createMemo<Socket | null>(prev => {
         prev?.disconnect();
@@ -41,6 +62,12 @@ export const FileList = (props: FileListProps) => {
         })
     }, null);
 
+    const context: FileListContext = {
+        getItem(name: string) {
+            return itemList()?.find(item => item.name === name);
+        }
+    };
+
     const refreshList = async (reload: boolean) => {
         if (reload) {
             setItemList(null);
@@ -49,30 +76,7 @@ export const FileList = (props: FileListProps) => {
             const response = await cr.get(`/api/storage/${cr.getPathString(props.location)}`);
 
             if (response.items !== undefined) {
-                const origin = [...itemList() ?? []];
-
-                response.items.forEach(item => {
-                    const index = origin.findIndex(e => e.name === item.name);
-
-                    if (index === -1) {
-                        origin.push(item);
-                    } else {
-                        const keys = Object.keys(item) as (keyof cloud.Item)[];
-                        console.log(item.name);
-                        // if (!keys.every(key => item[key] === origin[index][key])) {
-                        //     console.log('refres', item.name);
-                        //     origin[index] = item;                            
-                        // }
-
-                        keys.forEach(key => {
-                            item[key] !== origin[index][key];
-                        });
-                    }
-                });
-
-                console.log(origin);
-
-                setItemList(origin);
+                setItemList(response.items);
             }
         } catch (error) {
             // TODO: 요청 실패 처리하기
@@ -209,83 +213,86 @@ export const FileList = (props: FileListProps) => {
     });
 
     return (
-        <Stack
-            sx={props.sx}>
+        <FileListContext.Provider value={context}>
+            <Stack
+                sx={props.sx}>
 
-            <FunctionBar
-                onUploadClick={() => {
-                    // TODO: 파일 업로드
-                }}
-                onCreateFolderClick={async () => {
-                    const result = await promptDialog.show(smulogContainer, {
-                        title: 'Create Folder'
-                    }, {
-                        message: '폴더 이름을 입력하세요.',
-                        label: 'New Folder'
-                    });
+                <FunctionBar
+                    onUploadClick={() => {
+                        // TODO: 파일 업로드
+                    }}
+                    onCreateFolderClick={async () => {
+                        const result = await promptDialog.show(smulogContainer, {
+                            title: 'Create Folder'
+                        }, {
+                            message: '폴더 이름을 입력하세요.',
+                            label: 'New Folder'
+                        });
 
-                    if (result.response === 'positive') {
-                        if (result.returns !== undefined) {
-                            createFolder(result.returns.value);
+                        if (result.response === 'positive') {
+                            if (result.returns !== undefined) {
+                                createFolder(result.returns.value);
+                            }
                         }
-                    }
-                }}
-                onCreateFileClick={async () => {
-                    const result = await promptDialog.show(smulogContainer, {
-                        title: 'Create File'
-                    }, {
-                        message: '파일 이름을 입력하세요.',
-                        label: 'New File'
-                    });
+                    }}
+                    onCreateFileClick={async () => {
+                        const result = await promptDialog.show(smulogContainer, {
+                            title: 'Create File'
+                        }, {
+                            message: '파일 이름을 입력하세요.',
+                            label: 'New File'
+                        });
 
-                    if (result.response === 'positive') {
-                        if (result.returns !== undefined) {
-                            createFile(result.returns.value);
+                        if (result.response === 'positive') {
+                            if (result.returns !== undefined) {
+                                createFile(result.returns.value);
+                            }
                         }
-                    }
-                }} />
+                    }} />
 
-            <Switch
-                fallback={
-                    <For
-                        each={createRandomNullArray()}>
-                        {(item: cloud.Item | null) => (
-                            <FileListItem
-                                item={item}
-                                onClick={e => {
-                                    if (item !== null) {
-                                        props.onItemClick?.(item);
-                                    }
-                                }} />
-                        )}
-                    </For>
-                }>
-                <Match
-                    when={itemList() !== null}>
-                    <Show
-                        when={props.location.path.length > 0}>
-                        <UpItem
-                            onClick={e => {
-                                props.onUpClick?.();
-                            }} />
-                    </Show>
-                    <For
-                        each={itemList()}>
-                        {(item, index) => {
-                            console.log(index());
-                            return (
+                <Switch
+                    fallback={
+                        <For
+                            each={createRandomNullArray()}>
+                            {(name: null) => (
                                 <FileListItem
-                                    item={item}
-                                    onClick={e => {
-                                        if (item !== null) {
-                                            props.onItemClick?.(item);
-                                        }
-                                    }} />
-                            );
-                        }}
-                    </For>
-                </Match>
-            </Switch>
-        </Stack>
+                                    name={name} />
+                            )}
+                        </For>
+                    }>
+                    <Match
+                        when={itemList() !== null}>
+                        <Show
+                            when={props.location.path.length > 0}>
+                            <UpItem
+                                onClick={e => {
+                                    props.onUpClick?.();
+                                }} />
+                        </Show>
+                        <For
+                            each={itemNameList()}>
+                            {(name, index) => {
+                                console.log(index());
+                                return (
+                                    <FileListItem
+                                        name={name}
+                                        onClick={e => {
+                                            if (name !== null) {
+                                                const item = context.getItem(name);
+
+                                                if (item === undefined) {
+                                                    throw new Error('Item is undefined');
+                                                }
+
+                                                props.onItemClick?.(item);
+                                            }
+                                        }} />
+                                );
+                            }}
+                        </For>
+                    </Match>
+                </Switch>
+            </Stack>
+        </FileListContext.Provider>
     );
 };
