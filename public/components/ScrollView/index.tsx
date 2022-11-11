@@ -84,7 +84,7 @@ export const ScrollView = (props: ScrollViewProps) => {
                     sx={{
                         width: `${width()}px`,
                         height: `${scrollBarHeight()}px`,
-                        background: 'rgba(0, 0, 0, 0.1)',
+                        background: theme.palette.primary.light,
                         borderRadius: `${width() / 2}px`,
                         overflow: 'hidden'
                     }}>
@@ -93,7 +93,7 @@ export const ScrollView = (props: ScrollViewProps) => {
                         sx={{
                             width: `${width()}px`,
                             height: `${thumbHeight()}px`,
-                            background: theme.palette.secondary.main,
+                            background: theme.palette.primary.dark,
                             borderRadius: `${width() / 2}px`,
                             marginTop: `${scroll() / contentHeight() * scrollBarHeight()}px`,
                             transition: 'height 0.2s ease-in-out'
