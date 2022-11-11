@@ -18,7 +18,7 @@ const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props
     const [value, setValue] = createSignal('');
 
     const dialog = useDialog<PromptDialogReturns>();
-    
+
     dialog.setButtons({
         positive: () => (
             <Button
@@ -47,7 +47,10 @@ const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props
         <Stack
             direction="column"
             spacing={1}>
-            <Typography>{props.message}</Typography>
+            <Typography
+                variant='body1'>
+                {props.message}
+            </Typography>
             <TextField
                 value={value()}
                 onChange={(event, value) => {
