@@ -49,15 +49,6 @@ export const Storage = (props: StorageProps) => {
 
     console.log(location().scope);
 
-    const [arr, setArr] = createSignal([
-        {
-            id: 3
-        },
-        {
-            id: 2
-        }
-    ]);
-
     return (
         <ThemeProvider
             theme={theme}>
@@ -76,22 +67,7 @@ export const Storage = (props: StorageProps) => {
                             minHeight: '100%',
                             marginLeft: '24px',
                             marginRight: '24px',
-                        }}
-                        onClick={e => {
-                            const a = arr().concat({
-                                    id: 0
-                                }
-                            );
-
-                            a.sort((a, b) => a.id - b.id);
-                            setArr(a);
                         }}>
-                        <For each={arr()}>
-                            {(item, index) => {
-                                console.log(index());
-                                return item.id;
-                            }}
-                        </For>
 
                         <Stack>
                             <Typography variant='h3'>{location().scope}</Typography>
