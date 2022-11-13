@@ -52,7 +52,7 @@ export const UpItem = (props: UpItemProps) => {
                         sx={{
                             display: 'flex'
                         }}
-                        variant="subtitle1">
+                        variant="subtitle2">
                         To up directory
                     </Typography>
                 </Stack>
