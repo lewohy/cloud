@@ -48,6 +48,20 @@ export default function startAPIServer(app: core.Express) {
         }
     });
 
+    app.put<{}, cloud.protocol.storage.PutResponse, cloud.protocol.storage.PutRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
+        const location = getLocation(req);
+        const request = req.body as cloud.protocol.storage.PutRequest;
+        const entity = request.entity;
+
+        try {
+            // TODO: 테스트하기
+            await renameFile(location, entity, request.newFilename);
+            res.status(200).send();
+        } catch (e) {
+            sendError(res, e);
+        }
+    });
+
     app.delete<{}, cloud.protocol.storage.DeleteResponse, cloud.protocol.storage.DeleteRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
         const location = getLocation(req);
         const request = req.body as cloud.protocol.storage.DeleteRequest;
@@ -60,20 +74,6 @@ export default function startAPIServer(app: core.Express) {
             }
 
             await deleteFile(location, filename);
-            res.status(200).send();
-        } catch (e) {
-            sendError(res, e);
-        }
-    });
-
-    app.put<{}, cloud.protocol.storage.PutResponse, cloud.protocol.storage.PutRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
-        const location = getLocation(req);
-        const request = req.body as cloud.protocol.storage.PutRequest;
-        const entity = request.entity;
-
-        try {
-            // TODO: 테스트하기
-            await renameFile(location, entity, request.newFilename);
             res.status(200).send();
         } catch (e) {
             sendError(res, e);
