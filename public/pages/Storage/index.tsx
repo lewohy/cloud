@@ -5,11 +5,12 @@ import Container from '@suid/material/Container';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import { PathItem } from '~/public/components/PathItem';
-import { createMemo, For } from 'solid-js';
+import { createEffect, createMemo, For } from 'solid-js';
 import { FileList } from '~/public/components/FileList';
 import { grey, blue } from '@suid/material/colors';
 import { ScrollView } from '~/public/components/ScrollView';
 import { SmulogContainer } from '~/public/dialogs/dialog';
+import cr from '~/public/ts/cr';
 
 type StorageParams = Record<'scope' | 'path', string>;
 
@@ -44,7 +45,9 @@ export const Storage = (props: StorageProps) => {
     }));
     const navigate = useNavigate();
 
-    console.log(location().scope);
+    createEffect(() => {
+        document.title = `${cr.getPathString(location())}`;
+    });
 
     return (
         <ThemeProvider
