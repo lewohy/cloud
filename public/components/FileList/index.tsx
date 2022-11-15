@@ -231,7 +231,7 @@ export const FileList = (props: FileListProps) => {
 
                         if (result.response === 'positive') {
                             if (result.returns !== undefined) {
-                                createFolder(result.returns.value);
+                                await createFolder(result.returns.value);
                             }
                         }
                     }}
@@ -245,7 +245,7 @@ export const FileList = (props: FileListProps) => {
 
                         if (result.response === 'positive') {
                             if (result.returns !== undefined) {
-                                createFile(result.returns.value);
+                                await createFile(result.returns.value);
                             }
                         }
                     }} />
