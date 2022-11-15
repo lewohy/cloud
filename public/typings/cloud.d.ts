@@ -74,9 +74,7 @@ declare global {
 
                 }
 
-                interface DeleteRequest {
-
-                }
+                type DeleteRequest = void;
 
                 interface DeleteResponse extends Response {
 
