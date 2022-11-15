@@ -64,6 +64,10 @@ export const ScrollView = (props: ScrollViewProps) => {
                 }
             }}>
             <Stack
+                sx={{
+                    width: '100%',
+                    minHeight: '100%',
+                }}
                 ref={setContent}>
                 {
                     props.children
