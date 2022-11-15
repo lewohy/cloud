@@ -6,15 +6,30 @@ import path from 'path';
 import config from '~/config.json';
 import logger from './logger';
 import { getAbsoluteContentsPath, getAbsoluteTempPath, modifyMeta } from './meta';
-import { isFile } from './typguard';
+import { isFile, isString } from './typguard';
 
 export function getLocation(req: core.Request): cloud.Location {
+    if (!isString(req.params[0]) && !isString(req.params[1])) {
+        throw new Error('Invalid location');
+    }
+    
     const scope = req.params[0];
     const path = req.params[1]?.split('/')?.filter((p) => p !== '') ?? [];
 
     return {
         scope,
         path
+    };
+}
+
+export function getBaseLocation(location: cloud.Location): cloud.Location {
+    if (location.path.length === 0) {
+        throw new Error(`Cannt get base location of ${location.scope}/${location.path.join('/')}`);
+    }
+
+    return {
+        scope: location.scope,
+        path: location.path.slice(0, location.path.length - 1)
     };
 }
 

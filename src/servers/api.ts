@@ -1,5 +1,5 @@
 import * as core from 'express-serve-static-core';
-import { getLocation, createNormalDirectory, createPendingFile, deleteFile, renameFile, createNormalFile } from '~/src/core';
+import { getLocation, createNormalDirectory, createPendingFile, deleteItem, renameItem, createNormalFile } from '~/src/core';
 import logger, { sendError } from '~/src/logger';
 import { isString } from '~/src/typguard';
 import { sleep } from '../test';
@@ -8,9 +8,8 @@ import { getMeta } from '~/src/meta';
 export default function startAPIServer(app: core.Express) {
     // NOTE: storage api 서버
     app.get<{}, cloud.protocol.storage.GetResponse, cloud.protocol.storage.GetRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
-        const location = getLocation(req);
-
         try {
+            const location = getLocation(req);
             const meta = getMeta(location);
 
             res.status(200).send({
@@ -55,7 +54,7 @@ export default function startAPIServer(app: core.Express) {
 
         try {
             // TODO: 테스트하기
-            await renameFile(location, entity, request.newFilename);
+            await renameItem(location, entity, request.newFilename);
             res.status(200).send();
         } catch (e) {
             sendError(res, e);
@@ -73,7 +72,7 @@ export default function startAPIServer(app: core.Express) {
                 throw new Error(`Invalid request. filename: ${filename}`);
             }
 
-            await deleteFile(location, filename);
+            await deleteItem(location, filename);
             res.status(200).send();
         } catch (e) {
             sendError(res, e);
