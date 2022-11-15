@@ -17,3 +17,8 @@ export function isDirectory(entity: cloud.Entity): entity is cloud.Directory {
 export function isSocketQuery(value: any): value is cloud.protocol.socketio.Query {
     return value !== undefined && isString(value.room);
 }
+
+// TODO: 좀더 엄격한 검사 필요
+export function isError(value: any): value is Error {
+    return value !== undefined && isString(value.message);
+}
