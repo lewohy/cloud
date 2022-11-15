@@ -318,7 +318,25 @@ export const FileList = (props: FileListProps) => {
                                 }} />
                         </Show>
                         <For
-                            each={itemNameList()}>
+                            each={itemNameList()}
+                            fallback={
+                                <Stack
+                                    sx={{
+                                        width: '100%',
+                                        height: '100%',
+                                    }}
+                                    alignItems="center"
+                                    justifyContent="center">
+                                    <Typography
+                                        sx={{
+                                            width: 'auto',
+                                            height: 'auto',
+                                            color: 'text.disabled'
+                                        }}>
+                                        Empty
+                                    </Typography>
+                                </Stack>
+                            }>
                             {(name, index) => {
                                 return (
                                     <FileListItem
