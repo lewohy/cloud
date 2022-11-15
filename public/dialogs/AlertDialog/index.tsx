@@ -10,29 +10,24 @@ import ListItem from '@suid/material/ListItem';
 import ListItemButton from '@suid/material/ListItemButton';
 import ListItemText from '@suid/material/ListItemText';
 
-interface PromptDialogReturns {
-    value: string;
+interface AlertDialogReturns {
+    
 }
 
-interface PromptDialogProps {
+interface AlertDialogProps {
     message: string;
-    label?: string;
 }
 
-const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props: PromptDialogProps) => {
-    const [value, setValue] = createSignal('');
+const alertDialog = createSmulog<AlertDialogReturns, AlertDialogProps>((props: AlertDialogProps) => {
 
-    const dialog = useDialog<PromptDialogReturns>();
+    const dialog = useDialog<AlertDialogReturns>();
 
     dialog.setButtons({
         positive: () => (
             <Button
                 onClick={e => {
                     dialog.close({
-                        response: 'positive',
-                        returns: {
-                            value: value()
-                        }
+                        response: 'positive'
                     });
                 }}>
                 OK
@@ -56,14 +51,8 @@ const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props
                 variant='body1'>
                 {props.message}
             </Typography>
-            <TextField
-                value={value()}
-                onChange={(event, value) => {
-                    setValue(value);
-                }}
-                label={props.label} />
         </Stack>
     );
 });
 
-export default promptDialog;
+export default alertDialog;

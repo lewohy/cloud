@@ -122,6 +122,7 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
         if (file !== undefined) {
             if (isFile(file)) {
                 file.createdTime = dayjs().valueOf();
+                file.state = 'pending';
             } else {
                 throw new Error(`The entity is directory. ${getPathString(location)}/${file.name}`);
             }
@@ -204,7 +205,7 @@ export async function writeToTemp(location: cloud.Location, filename: string, da
     });
 }
 
-export async function deleteFile(location: cloud.Location, filename: string): Promise<cloud.Meta> {
+export async function deleteItem(location: cloud.Location, name: string): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
         const absolutePath = getAbsoluteContentsPath(location);
 
@@ -212,23 +213,25 @@ export async function deleteFile(location: cloud.Location, filename: string): Pr
             throw new Error(`No entity found. ${getPathString(location)}`);
         }
 
-        const file = meta.items.find((e) => e.name === filename);
+        const file = meta.items.find((e) => e.name === name);
         if (file === undefined) {
-            throw new Error(`No meta found. ${getPathString(location)}/${filename}`);
+            throw new Error(`No meta found. ${getPathString(location)}/${name}`);
         }
 
-        fs.unlinkSync(path.resolve(absolutePath, filename));
+        fs.rmSync(path.resolve(absolutePath, name), {
+            recursive: true
+        });
 
-        meta.items = meta.items.filter((e) => e.name !== filename);
+        meta.items = meta.items.filter((e) => e.name !== name);
 
         return meta;
     });
 }
 
-export async function renameFile(location: cloud.Location, entity: cloud.Entity, newFilename: string): Promise<cloud.Meta> {
+export async function renameItem(location: cloud.Location, entity: cloud.Entity, newName: string): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
         const oldAbsolutePath = path.resolve(getAbsoluteContentsPath(location), entity.name);
-        const newAbsolutePath = path.resolve(getAbsoluteContentsPath(location), newFilename);
+        const newAbsolutePath = path.resolve(getAbsoluteContentsPath(location), newName);
 
         if (!fs.existsSync(oldAbsolutePath)) {
             throw new Error(`No entity found. ${location.scope}/${location.path.join('/')}/${entity.name}`);
@@ -241,7 +244,7 @@ export async function renameFile(location: cloud.Location, entity: cloud.Entity,
 
         fs.renameSync(path.resolve(oldAbsolutePath), path.resolve(newAbsolutePath));
 
-        file.name = newFilename;
+        file.name = newName;
 
         return meta;
     });

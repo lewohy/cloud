@@ -1,8 +1,5 @@
 import FolderOutlined from '@suid/icons-material/FolderOutlined';
 import InsertDriveFile from '@suid/icons-material/InsertDriveFile';
-import { useTheme } from '@suid/material';
-import Box from '@suid/material/Box';
-import ButtonBase from '@suid/material/ButtonBase';
 import LinearProgress from '@suid/material/LinearProgress';
 import Skeleton from '@suid/material/Skeleton';
 import Stack from '@suid/material/Stack';
@@ -12,13 +9,20 @@ import { createMemo, JSX, Match, Switch } from 'solid-js';
 import { isFile, isFileEntry } from '~/public/ts/typeguard';
 import { RippleBase, RippleBaseProps } from '~/public/components/RippleBase';
 import { useFileList } from '..';
+import { FileListItemMenu } from './FileListItemMenu';
+import { useDialogContainer } from '~/public/dialogs/dialog';
+import promptDialog from '~/public/dialogs/PromptDialog';
+import alertDialog from '~/public/dialogs/AlertDialog';
 
 export interface FileListItemProps {
     name: string | null;
     onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
+    onRename?: () => void;
+    onDelete?: () => void;
 }
 
 export const FileListItem = (props: FileListItemProps) => {
+    const smulogContainer = useDialogContainer();
     const fileList = useFileList();
     const item = createMemo(() => {
         return fileList.getItem(props.name);
@@ -50,7 +54,7 @@ export const FileListItem = (props: FileListItemProps) => {
                 alignItems="center"
                 direction="row">
 
-                <Box
+                <Stack
                     sx={{
                         width: '48px',
                         height: '48px',
@@ -81,7 +85,7 @@ export const FileListItem = (props: FileListItemProps) => {
                                 }} />
                         </Match>
                     </Switch>
-                </Box>
+                </Stack>
 
                 <Stack
                     spacing="8px"
@@ -133,7 +137,7 @@ export const FileListItem = (props: FileListItemProps) => {
                             </Match>
                             <Match
                                 when={item()?.state === 'uploading'}>
-                                <Box
+                                <Stack
                                     sx={{
                                         width: '100%',
                                         height: '1.57em', // NOTE: line-height를 직접 가져오는 방법 없는지?
@@ -147,11 +151,15 @@ export const FileListItem = (props: FileListItemProps) => {
                                         variant="determinate"
                                         color='secondary'
                                         value={getUploadProgress(item())} />
-                                </Box>
+                                </Stack>
                             </Match>
                         </Switch>
                     </Typography>
                 </Stack>
+
+                <FileListItemMenu
+                    onRename={props.onRename}
+                    onDelete={props.onDelete}/>
             </Stack>
         </RippleBase >
     );

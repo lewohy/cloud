@@ -1,7 +1,7 @@
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import axios from 'axios';
-import { useDialogContainer as useSmulogContainer } from '~/public/dialogs/dialog';
+import { useDialogContainer } from '~/public/dialogs/dialog';
 import promptDialog from '~/public/dialogs/PromptDialog';
 import random from 'random';
 import { createContext, createEffect, createMemo, createSignal, For, Match, Show, Switch, useContext } from 'solid-js';
@@ -13,6 +13,8 @@ import { io, Socket } from 'socket.io-client';
 import { SxProps } from "@suid/system";
 import { Theme } from "@suid/system/createTheme";
 import { isDirectoryEntry, isFileEntry } from '~/public/ts/typeguard';
+import { checkListDialog } from '~/public/dialogs/CheckListDialog';
+import alertDialog from '~/public/dialogs/AlertDialog';
 
 
 interface FileListContext {
@@ -50,7 +52,7 @@ export const FileList = (props: FileListProps) => {
         return itemList()?.map((item) => item.name) ?? null;
     });
 
-    const smulogContainer = useSmulogContainer();
+    const smulogContainer = useDialogContainer();
     const socket = createMemo<Socket | null>(prev => {
         prev?.disconnect();
 
@@ -114,6 +116,15 @@ export const FileList = (props: FileListProps) => {
         }
     };
 
+    const deleteItem = async (name: string) => {
+        try {
+            const result = await cr.delete(`/api/storage/${cr.getPathString(props.location)}/${name}`);
+        } catch (error) {
+            // TODO: 요청 실패 처리하기
+            console.error(error);
+        }
+    };
+
     const getFileEntryList = (entry: FileSystemEntry): Promise<FileSystemFileEntry[]> => {
         return new Promise((resolve, reject) => {
 
@@ -141,8 +152,13 @@ export const FileList = (props: FileListProps) => {
         }
     };
 
-    const getDuplicateFileList = async (entryList: FileSystemFileEntry[]): Promise<cloud.Item[]> => {
-        const duplicated = (await Promise.all(entryList.map(getItemMeta))).filter(item => item !== undefined) as cloud.Item[];
+    const getDuplicateFileList = async (entryList: FileSystemFileEntry[]): Promise<FileSystemFileEntry[]> => {
+        // TODO: Promise all사용으로 시간 단축하기
+        const duplicated = (await Promise.all(entryList.map(async entry => {
+            const meta = await getItemMeta(entry);
+
+            return meta === undefined ? undefined : entry;
+        }))).filter(meta => meta !== undefined) as FileSystemFileEntry[];
 
         return duplicated;
     };
@@ -166,13 +182,9 @@ export const FileList = (props: FileListProps) => {
                 const fileEntryList = (await Promise.all(entryList.map(getFileEntryList))).flat();
                 const duplicated = await getDuplicateFileList(fileEntryList);
 
-                fileEntryList.forEach(e => {
-                    console.log(e.fullPath);
-                })
-
                 if (duplicated.length === 0) {
                     fileEntryList.forEach(async fileEntry => {
-                        cr.post(`/api/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, {
+                        await cr.post(`/api/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, {
                             entity: {
                                 type: 'file',
                                 name: fileEntry.name,
@@ -180,8 +192,33 @@ export const FileList = (props: FileListProps) => {
                             }
                         });
 
-                        cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
+                        await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
                     });
+                } else {
+                    const result = await checkListDialog.show(smulogContainer, {
+                        title: '중복된 파일',
+                    }, {
+                        message: '덮어쓸 파일 선택',
+                        list: duplicated
+                    });
+
+                    if (result.response === 'positive') {
+                        if (result.returns !== undefined) {
+                            console.log(result.returns);
+
+                            fileEntryList.filter(entry => !duplicated.includes(entry)).concat(...result.returns.checkedList).forEach(async fileEntry => {
+                                await cr.post(`/api/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, {
+                                    entity: {
+                                        type: 'file',
+                                        name: fileEntry.name,
+                                        state: 'pending'
+                                    }
+                                });
+
+                                await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
+                            });
+                        }
+                    }
                 }
             }
         });
@@ -272,7 +309,6 @@ export const FileList = (props: FileListProps) => {
                         <For
                             each={itemNameList()}>
                             {(name, index) => {
-                                console.log(index());
                                 return (
                                     <FileListItem
                                         name={name}
@@ -285,6 +321,27 @@ export const FileList = (props: FileListProps) => {
                                                 }
 
                                                 props.onItemClick?.(item);
+                                            }
+                                        }}
+                                        onRename={async () => {
+                                            const result = await promptDialog.show(smulogContainer, {
+                                                title: 'Rename',
+                                                cancelOnTouchOutside: true,
+                                            }, {
+                                                message: 'Enter new name',
+                                                label: 'New name',
+                                            });
+                                        }}
+                                        onDelete={async () => {
+                                            const result = await alertDialog.show(smulogContainer, {
+                                                title: 'Delete',
+                                                cancelOnTouchOutside: true,
+                                            }, {
+                                                message: `'${name}' will be deleted. Are you sure?`,
+                                            });
+
+                                            if (result.response === 'positive') {
+                                                await deleteItem(name);
                                             }
                                         }} />
                                 );

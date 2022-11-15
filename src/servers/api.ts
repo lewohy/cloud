@@ -1,5 +1,5 @@
 import * as core from 'express-serve-static-core';
-import { getLocation, createNormalDirectory, createPendingFile, deleteItem, renameItem, createNormalFile } from '~/src/core';
+import { getLocation, createNormalDirectory, createPendingFile, deleteItem, renameItem, createNormalFile, getBaseLocation } from '~/src/core';
 import logger, { sendError } from '~/src/logger';
 import { isString } from '~/src/typguard';
 import { sleep } from '../test';
@@ -22,11 +22,11 @@ export default function startAPIServer(app: core.Express) {
     });
 
     app.post<{}, cloud.protocol.storage.PostResponse, cloud.protocol.storage.PostRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
-        const location = getLocation(req);
-        const request = req.body as cloud.protocol.storage.PostRequest;
-        const entity = request.entity;
-
         try {
+            const location = getLocation(req);
+            const request = req.body as cloud.protocol.storage.PostRequest;
+            const entity = request.entity;
+
             if (entity.type === 'directory') {
                 if (entity.state === 'normal') {
                     await createNormalDirectory(location, entity);
@@ -48,11 +48,11 @@ export default function startAPIServer(app: core.Express) {
     });
 
     app.put<{}, cloud.protocol.storage.PutResponse, cloud.protocol.storage.PutRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
-        const location = getLocation(req);
-        const request = req.body as cloud.protocol.storage.PutRequest;
-        const entity = request.entity;
-
         try {
+            const location = getLocation(req);
+            const request = req.body as cloud.protocol.storage.PutRequest;
+            const entity = request.entity;
+
             // TODO: 테스트하기
             await renameItem(location, entity, request.newFilename);
             res.status(200).send();
@@ -62,17 +62,17 @@ export default function startAPIServer(app: core.Express) {
     });
 
     app.delete<{}, cloud.protocol.storage.DeleteResponse, cloud.protocol.storage.DeleteRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
-        const location = getLocation(req);
-        const request = req.body as cloud.protocol.storage.DeleteRequest;
-        const filename = req.headers['filename'];
-
         try {
+            const location = getLocation(req);
+            const request = req.body as cloud.protocol.storage.DeleteRequest;
+            const name = location.path[location.path.length - 1];
+
             // TODO: 테스트하기
-            if (!isString(filename)) {
-                throw new Error(`Invalid request. filename: ${filename}`);
+            if (!isString(name)) {
+                throw new Error(`Invalid request. filename: ${name}`);
             }
 
-            await deleteItem(location, filename);
+            await deleteItem(getBaseLocation(location), name);
             res.status(200).send();
         } catch (e) {
             sendError(res, e);

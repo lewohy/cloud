@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
 import dayjs from 'dayjs';
 import * as core from 'express-serve-static-core';
-import { commitFile, deleteTempFile, getLocation, writeToTemp } from '~/src/core';
+import { commitFile, deleteTempFile, getLocation, getPathString, writeToTemp } from '~/src/core';
 import { isFile, isNumber, isString } from '~/src/typguard';
 import logger, { sendError } from '~/src/logger';
 import { modifyMeta } from '~/src/meta';
@@ -29,18 +29,19 @@ export default function startUploadServer(app: core.Express) {
                 const entity = meta.items.find((e) => e.name === filename);
 
                 if (entity === undefined) {
-                    throw new Error(`Invalid access. There is no pending file. ${location.scope}/${location.path.join('/')}/${filename}`);
+                    throw new Error(`Invalid access. There is no pending file. ${getPathString(location)}/${filename}`);
                 }
 
                 if (!isFile(entity)) {
-                    throw new Error(`The entity is directory. ${location.scope}/${location.path.join('/')}/${entity.name}`);
+                    throw new Error(`The entity is directory. ${getPathString(location)}/${entity.name}`);
                 }
 
                 if(entity.state !== 'pending') {
-                    throw new Error(`The entity is not pending. ${location.scope}/${location.path.join('/')}/${entity.name}`);
+                    throw new Error(`The entity is not pending. ${getPathString(location)}/${entity.name}`);
                 }
 
                 entity.size = size;
+                entity.uploaded = 0;
                 entity.createdTime = dayjs().valueOf();
 
                 return meta;

@@ -32,6 +32,30 @@ const cr = {
             throw new Error(`Failed to post. status: ${response.status}, message: ${response.data?.error?.message}`);
         }
     },
+    async put(url: string, request: cloud.protocol.storage.PutRequest): Promise<cloud.protocol.storage.PutResponse> {
+        const response = await axios.put<
+            cloud.protocol.storage.PutResponse,
+            AxiosResponse<cloud.protocol.storage.PutResponse>,
+            cloud.protocol.storage.PutRequest>(url, request);
+
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            throw new Error(`Failed to put. status: ${response.status}, message: ${response.data?.error?.message}`);
+        }
+    },
+    async delete(url: string): Promise<cloud.protocol.storage.DeleteResponse> {
+        const response = await axios.delete<
+            cloud.protocol.storage.DeleteResponse,
+            AxiosResponse<cloud.protocol.storage.DeleteResponse>,
+            cloud.protocol.storage.DeleteRequest>(url);
+
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            throw new Error(`Failed to delete. status: ${response.status}, message: ${response.data?.error?.message}`);
+        }
+    },
     async upload(url: string, fileEntry: FileSystemFileEntry): Promise<cloud.protocol.storage.UploadResponse> {
         const response = await axios.post<
             cloud.protocol.storage.UploadResponse,

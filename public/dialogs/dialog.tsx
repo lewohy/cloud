@@ -96,16 +96,15 @@ export function SmulogContainer(props: { children: JSX.Element }) {
 
                             return createComponent(() => {
                                 return (
-                                    <Box
+                                    <Stack
                                         sx={{
                                             position: 'fixed',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            width: 'auto',
-                                            height: 'auto',
-                                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                            width: '100%',
+                                            height: '100%',
+                                            backgroundColor: 'rgba(0, 0, 0, 0.5)', // TODO: 테마에서 가져오기
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
                                         }}>
                                         <SmulogContext.Provider value={{
                                             close: (response?: Response<any>) => {
@@ -121,23 +120,26 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                 setButtons(buttons);
                                             }
                                         }}>
-                                            <Box
+                                            <Stack
                                                 sx={{
-                                                    position: "absolute",
-                                                    top: "50%",
-                                                    left: "50%",
-                                                    transform: "translate(-50%, -50%)",
-                                                    minWidth: 540,
+                                                    width: '540px',
+                                                    height: 'auto',
+                                                    maxWidth: '100%',
+                                                    maxHeight: '80%',
                                                     bgcolor: 'background.default',
                                                     boxShadow: "0px 0px 32px rgba(0,0,0,0.2)",
                                                     borderRadius: 1
                                                 }}>
 
                                                 <Stack
+                                                    sx={{
+                                                        height: 'auto',
+                                                        maxHeight: '100%',
+                                                    }}
                                                     direction="column">
                                                     {
                                                         data.option.title &&
-                                                        <Box
+                                                        <Stack
                                                             sx={{
                                                                 padding: '0px 24px'
                                                             }}>
@@ -147,21 +149,23 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                                 sx={{
                                                                     padding: '16px 0px'
                                                                 }}
-                                                                >
+                                                            >
                                                                 {data.option.title}
                                                             </Typography>
 
-                                                        </Box>
+                                                        </Stack>
                                                     }
 
-                                                    <Box
+                                                    <Stack
                                                         sx={{
+                                                            flex: 1,
+                                                            height: '0px',
                                                             padding: '0px 24px'
                                                         }}>
 
                                                         {createComponent(data.smulog.component, data.props)}
 
-                                                    </Box>
+                                                    </Stack>
 
                                                     <Stack
                                                         direction="row"
@@ -178,9 +182,9 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                         }
                                                     </Stack>
                                                 </Stack>
-                                            </Box>
+                                            </Stack>
                                         </SmulogContext.Provider>
-                                    </Box>
+                                    </Stack>
                                 )
 
                             }, {})
