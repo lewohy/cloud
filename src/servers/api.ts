@@ -49,12 +49,13 @@ export default function startAPIServer(app: core.Express) {
 
     app.put<{}, cloud.protocol.storage.PutResponse, cloud.protocol.storage.PutRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
         try {
+
             const location = getLocation(req);
+            const name = location.path[location.path.length - 1];
             const request = req.body as cloud.protocol.storage.PutRequest;
-            const entity = request.entity;
 
             // TODO: 테스트하기
-            await renameItem(location, entity, request.newFilename);
+            await renameItem(getBaseLocation(location), name, request.name);
             res.status(200).send();
         } catch (e) {
             sendError(res, e);
@@ -64,7 +65,6 @@ export default function startAPIServer(app: core.Express) {
     app.delete<{}, cloud.protocol.storage.DeleteResponse, cloud.protocol.storage.DeleteRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
         try {
             const location = getLocation(req);
-            const request = req.body as cloud.protocol.storage.DeleteRequest;
             const name = location.path[location.path.length - 1];
 
             // TODO: 테스트하기

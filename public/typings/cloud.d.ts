@@ -65,9 +65,7 @@ declare global {
                 }
 
                 interface PutRequest {
-                    type: cloud.EntityType;
-                    entity: cloud.Entity;
-                    newFilename: string;
+                    name: string;
                 }
 
                 interface PutResponse extends Response {

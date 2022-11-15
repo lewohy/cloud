@@ -115,6 +115,17 @@ export const FileList = (props: FileListProps) => {
             console.error(error);
         }
     };
+    
+    const renameItem = async (name: string, newName: string) => {
+        try {
+            const result = await cr.put(`/api/storage/${cr.getPathString(props.location)}/${name}`, {
+                name: newName
+            });
+        } catch (error) {
+            // TODO: 요청 실패 처리하기
+            console.error(error);
+        }
+    };
 
     const deleteItem = async (name: string) => {
         try {
@@ -331,6 +342,12 @@ export const FileList = (props: FileListProps) => {
                                                 message: 'Enter new name',
                                                 label: 'New name',
                                             });
+
+                                            if (result.response === 'positive') {
+                                                if (result.returns !== undefined) {
+                                                    await renameItem(name, result.returns.value);
+                                                }
+                                            }
                                         }}
                                         onDelete={async () => {
                                             const result = await alertDialog.show(smulogContainer, {

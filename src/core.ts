@@ -67,6 +67,8 @@ export async function createNormalDirectory(location: cloud.Location, entity: cl
                 createdTime: dayjs().valueOf()
             } as cloud.Directory);
 
+            logger.info(`Created directory. ${absolutePath}`);
+
             return meta;
         });
     };
@@ -135,6 +137,8 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
             } as cloud.File);
         }
 
+        logger.info(`Pending file ${absoluteTempPath} created.`);
+
         return meta;
     });
 }
@@ -172,6 +176,8 @@ export async function createNormalFile(location: cloud.Location, entity: cloud.E
             uploaded: 0
         } as cloud.File);
 
+        logger.info(`Normal file ${absolutePath} created.`);
+
         return meta;
     });
 }
@@ -181,6 +187,8 @@ export function deleteTempFile(location: cloud.Location, filename: string): void
 
     if (fs.existsSync(absolutePath)) {
         fs.unlinkSync(absolutePath);
+
+        logger.info(`Deleted temp file. ${absolutePath}`);
     }
 }
 
@@ -207,7 +215,7 @@ export async function writeToTemp(location: cloud.Location, filename: string, da
 
 export async function deleteItem(location: cloud.Location, name: string): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
-        const absolutePath = getAbsoluteContentsPath(location);
+        const absolutePath = path.resolve(getAbsoluteContentsPath(location), name);
 
         if (!fs.existsSync(absolutePath)) {
             throw new Error(`No entity found. ${getPathString(location)}`);
@@ -218,33 +226,38 @@ export async function deleteItem(location: cloud.Location, name: string): Promis
             throw new Error(`No meta found. ${getPathString(location)}/${name}`);
         }
 
-        fs.rmSync(path.resolve(absolutePath, name), {
+        fs.rmSync(absolutePath, {
             recursive: true
         });
 
         meta.items = meta.items.filter((e) => e.name !== name);
 
+        logger.info(`Deleted. ${getPathString(location)}/${name}`);
+
         return meta;
     });
 }
 
-export async function renameItem(location: cloud.Location, entity: cloud.Entity, newName: string): Promise<cloud.Meta> {
+export async function renameItem(location: cloud.Location, from: string, to: string): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
-        const oldAbsolutePath = path.resolve(getAbsoluteContentsPath(location), entity.name);
-        const newAbsolutePath = path.resolve(getAbsoluteContentsPath(location), newName);
+        const oldAbsolutePath = path.resolve(getAbsoluteContentsPath(location), from);
+        const newAbsolutePath = path.resolve(getAbsoluteContentsPath(location), to);
+        // TODO: 여기 작업하기
 
-        if (!fs.existsSync(oldAbsolutePath)) {
-            throw new Error(`No entity found. ${location.scope}/${location.path.join('/')}/${entity.name}`);
+        const file = meta.items.find((e) => e.name === from);
+        if (file === undefined) {
+            throw new Error(`No meta found. ${getPathString(location)}/${from}`);
         }
 
-        const file = meta.items.find((e) => e.name === entity.name);
-        if (file === undefined) {
-            throw new Error(`No meta found. ${location.scope}/${location.path.join('/')}/${entity.name}`);
+        if (meta.items.findIndex((e) => e.name === to) !== -1) {
+            throw new Error(`Cannot replace. ${getPathString(location)}/${to} already exists.`);
         }
 
         fs.renameSync(path.resolve(oldAbsolutePath), path.resolve(newAbsolutePath));
 
-        file.name = newName;
+        file.name = to;
+
+        logger.info(`Renamed. ${oldAbsolutePath} -> ${newAbsolutePath}`);
 
         return meta;
     });
@@ -273,6 +286,8 @@ export async function commitFile(location: cloud.Location, filename: string): Pr
 
         const file = meta.items.find((e) => e.name === filename) as cloud.File;
         file.state = 'normal';
+
+        logger.info(`Commit file success. ${absoluteTempPath} -> ${absoluteContentsPath}`);
 
         return meta;
     });

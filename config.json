@@ -1,7 +1,8 @@
 {
     "port": 58001,
     "log": {
-        "debug": "./logs/debug.log"
+        "base": "logs",
+        "debug": "[debug]-YYYY-MM-DD HH'mm'ss.log"
     },
     "path": {
         "storage": {
