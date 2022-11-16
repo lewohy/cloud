@@ -5,7 +5,7 @@ import Skeleton from '@suid/material/Skeleton';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import dayjs from 'dayjs';
-import { createMemo, JSX, Match, Switch } from 'solid-js';
+import { createMemo, JSX, Match, Show, Switch } from 'solid-js';
 import { isFile, isFileEntry } from '~/public/ts/typeguard';
 import { RippleBase, RippleBaseProps } from '~/public/components/RippleBase';
 import { useFileList } from '..';
@@ -158,9 +158,12 @@ export const FileListItem = (props: FileListItemProps) => {
                     </Typography>
                 </Stack>
 
-                <FileListItemMenu
-                    onRename={props.onRename}
-                    onDelete={props.onDelete}/>
+                <Show
+                    when={item()?.state === 'normal'}>
+                    <FileListItemMenu
+                        onRename={props.onRename}
+                        onDelete={props.onDelete} />
+                </Show>
             </Stack>
         </RippleBase >
     );
