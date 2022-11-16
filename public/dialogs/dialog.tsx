@@ -1,6 +1,7 @@
 // TODO: 나중에 모듈로 분리하기
 
 import Box from '@suid/material/Box';
+import Fade from '@suid/material/Fade';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import { createComponent, createContext, createEffect, createSignal, For, JSX, useContext } from 'solid-js';
@@ -97,95 +98,98 @@ export function SmulogContainer(props: { children: JSX.Element }) {
 
                             return createComponent(() => {
                                 return (
-                                    <Stack
-                                        sx={{
-                                            position: 'fixed',
-                                            width: '100%',
-                                            height: '100%',
-                                            backgroundColor: 'rgba(0, 0, 0, 0.5)', // TODO: 테마에서 가져오기
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}>
-                                        <SmulogContext.Provider value={{
-                                            close: (response?: Response<any>) => {
-                                                if (response === undefined) {
-                                                    data.smulog.closeCall?.({
-                                                        response: 'negative'
-                                                    });
-                                                } else {
-                                                    data.smulog.closeCall?.(response);
+                                    <Fade
+                                        in={true}>
+                                        <Stack
+                                            sx={{
+                                                position: 'fixed',
+                                                width: '100%',
+                                                height: '100%',
+                                                backgroundColor: 'rgba(0, 0, 0, 0.5)', // TODO: 테마에서 가져오기
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}>
+                                            <SmulogContext.Provider value={{
+                                                close: (response?: Response<any>) => {
+                                                    if (response === undefined) {
+                                                        data.smulog.closeCall?.({
+                                                            response: 'negative'
+                                                        });
+                                                    } else {
+                                                        data.smulog.closeCall?.(response);
+                                                    }
+                                                },
+                                                setButtons: (buttons: SmulogButtons) => {
+                                                    setButtons(buttons);
                                                 }
-                                            },
-                                            setButtons: (buttons: SmulogButtons) => {
-                                                setButtons(buttons);
-                                            }
-                                        }}>
-                                            <Stack
-                                                sx={{
-                                                    width: '540px',
-                                                    height: 'auto',
-                                                    maxWidth: '100%',
-                                                    maxHeight: '80%',
-                                                    bgcolor: 'background.default',
-                                                    boxShadow: "0px 0px 32px rgba(0,0,0,0.2)",
-                                                    borderRadius: 1
-                                                }}>
-
+                                            }}>
                                                 <Stack
                                                     sx={{
+                                                        width: '540px',
                                                         height: 'auto',
-                                                        maxHeight: '100%',
-                                                    }}
-                                                    direction="column">
-                                                    {
-                                                        data.option.title &&
+                                                        maxWidth: '100%',
+                                                        maxHeight: '80%',
+                                                        bgcolor: 'background.default',
+                                                        boxShadow: "0px 0px 32px rgba(0,0,0,0.2)",
+                                                        borderRadius: 1
+                                                    }}>
+
+                                                    <Stack
+                                                        sx={{
+                                                            height: 'auto',
+                                                            maxHeight: '100%',
+                                                        }}
+                                                        direction="column">
+                                                        {
+                                                            data.option.title &&
+                                                            <Stack
+                                                                sx={{
+                                                                    padding: '0px 24px'
+                                                                }}>
+
+                                                                <Typography
+                                                                    variant="h6"
+                                                                    sx={{
+                                                                        padding: '16px 0px'
+                                                                    }}
+                                                                >
+                                                                    {data.option.title}
+                                                                </Typography>
+
+                                                            </Stack>
+                                                        }
+
                                                         <Stack
                                                             sx={{
+                                                                flex: 1,
+                                                                height: '0px',
                                                                 padding: '0px 24px'
                                                             }}>
 
-                                                            <Typography
-                                                                variant="h6"
-                                                                sx={{
-                                                                    padding: '16px 0px'
-                                                                }}
-                                                            >
-                                                                {data.option.title}
-                                                            </Typography>
+                                                            {createComponent(data.smulog.component, data.props)}
 
                                                         </Stack>
-                                                    }
 
-                                                    <Stack
-                                                        sx={{
-                                                            flex: 1,
-                                                            height: '0px',
-                                                            padding: '0px 24px'
-                                                        }}>
-
-                                                        {createComponent(data.smulog.component, data.props)}
-
-                                                    </Stack>
-
-                                                    <Stack
-                                                        direction="row"
-                                                        justifyContent="end"
-                                                        spacing="8px"
-                                                        sx={{
-                                                            padding: '8px'
-                                                        }}>
-                                                        {
-                                                            createComponent(buttons().negative ?? (() => <></>), {})
-                                                        }
-                                                        {
-                                                            createComponent(buttons().positive, {})
-                                                        }
+                                                        <Stack
+                                                            direction="row"
+                                                            justifyContent="end"
+                                                            spacing="8px"
+                                                            sx={{
+                                                                padding: '8px'
+                                                            }}>
+                                                            {
+                                                                createComponent(buttons().negative ?? (() => <></>), {})
+                                                            }
+                                                            {
+                                                                createComponent(buttons().positive, {})
+                                                            }
+                                                        </Stack>
                                                     </Stack>
                                                 </Stack>
-                                            </Stack>
-                                        </SmulogContext.Provider>
-                                    </Stack>
+                                            </SmulogContext.Provider>
+                                        </Stack>
+                                    </Fade>
                                 )
 
                             }, {})
