@@ -1,11 +1,8 @@
-import FolderOutlined from '@suid/icons-material/FolderOutlined';
-import { useTheme } from '@suid/material';
-import ButtonBase from '@suid/material/ButtonBase';
+import { Folder } from '@suid/icons-material';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
-import dayjs from 'dayjs';
 import { JSX } from 'solid-js';
-import { RippleBase, RippleBaseProps } from '~/public/components/RippleBase';
+import { RippleBase } from '~/public/components/RippleBase';
 
 export interface UpItemProps {
     onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
@@ -31,7 +28,7 @@ export const UpItem = (props: UpItemProps) => {
                 alignItems="center"
                 direction="row">
 
-                <FolderOutlined
+                <Folder
                     sx={{
                         fontSize: '48px'
                     }} />
