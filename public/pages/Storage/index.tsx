@@ -66,8 +66,8 @@ export const Storage = (props: StorageProps) => {
                                 width: '100%',
                                 height: 'auto',
                                 minHeight: '100%',
-                                marginLeft: '24px',
-                                marginRight: '24px',
+                                marginLeft: '4px',
+                                marginRight: '4px',
                             }}>
 
                             <Stack>
