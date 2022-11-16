@@ -1,10 +1,9 @@
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
-import axios from 'axios';
 import { useDialogContainer } from '~/public/dialogs/dialog';
 import promptDialog from '~/public/dialogs/PromptDialog';
 import random from 'random';
-import { createContext, createEffect, createMemo, createSignal, For, Match, Show, Switch, useContext } from 'solid-js';
+import { createContext, createEffect, createMemo, createSignal, For, JSX, Match, Show, Switch, useContext } from 'solid-js';
 import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
@@ -47,6 +46,7 @@ export function useFileList(): FileListContext {
 }
 
 export const FileList = (props: FileListProps) => {
+    const [dropping, setDropping] = createSignal(false);
     const [itemList, setItemList] = createSignal<cloud.Item[] | null>(null);
     const itemNameList = createMemo<string[] | null>((prev) => {
         return itemList()?.map((item) => item.name) ?? null;
@@ -85,7 +85,7 @@ export const FileList = (props: FileListProps) => {
                         return 1;
                     }
 
-                    return a.name.localeCompare(b.name);   
+                    return a.name.localeCompare(b.name);
                 }));
             }
         } catch (error) {
@@ -190,72 +190,56 @@ export const FileList = (props: FileListProps) => {
         });
     };
 
-    const init = () => {
-        document.body.addEventListener('drop', async e => {
-            e.preventDefault();
+    const onDrop = async (e: DragEvent) => {
+        e.preventDefault();
 
-            const items = e.dataTransfer?.items;
+        const items = e.dataTransfer?.items;
 
-            if (items !== undefined) {
-                const entryList = (await Promise.all(Array.from(items).map(item => item.webkitGetAsEntry()))).filter(entry => entry !== null) as FileSystemEntry[];
-                const fileEntryList = (await Promise.all(entryList.map(getFileEntryList))).flat();
-                const duplicated = await getDuplicateFileList(fileEntryList);
+        if (items !== undefined) {
+            const entryList = (await Promise.all(Array.from(items).map(item => item.webkitGetAsEntry()))).filter(entry => entry !== null) as FileSystemEntry[];
+            const fileEntryList = (await Promise.all(entryList.map(getFileEntryList))).flat();
+            const duplicated = await getDuplicateFileList(fileEntryList);
 
-                if (duplicated.length === 0) {
-                    fileEntryList.forEach(async fileEntry => {
-                        await cr.post(`/api/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, {
-                            entity: {
-                                type: 'file',
-                                name: fileEntry.name,
-                                state: 'pending'
-                            }
-                        });
-
-                        await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
-                    });
-                } else {
-                    const result = await checkListDialog.show(smulogContainer, {
-                        title: '중복된 파일',
-                    }, {
-                        message: '덮어쓸 파일 선택',
-                        list: duplicated
-                    });
-
-                    if (result.response === 'positive') {
-                        if (result.returns !== undefined) {
-                            console.log(result.returns);
-
-                            fileEntryList.filter(entry => !duplicated.includes(entry)).concat(...result.returns.checkedList).forEach(async fileEntry => {
-                                await cr.post(`/api/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, {
-                                    entity: {
-                                        type: 'file',
-                                        name: fileEntry.name,
-                                        state: 'pending'
-                                    }
-                                });
-
-                                await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
-                            });
+            if (duplicated.length === 0) {
+                fileEntryList.forEach(async fileEntry => {
+                    await cr.post(`/api/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, {
+                        entity: {
+                            type: 'file',
+                            name: fileEntry.name,
+                            state: 'pending'
                         }
+                    });
+
+                    await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
+                });
+            } else {
+                const result = await checkListDialog.show(smulogContainer, {
+                    title: '중복된 파일',
+                }, {
+                    message: '덮어쓸 파일 선택',
+                    list: duplicated
+                });
+
+                if (result.response === 'positive') {
+                    if (result.returns !== undefined) {
+                        console.log(result.returns);
+
+                        fileEntryList.filter(entry => !duplicated.includes(entry)).concat(...result.returns.checkedList).forEach(async fileEntry => {
+                            await cr.post(`/api/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, {
+                                entity: {
+                                    type: 'file',
+                                    name: fileEntry.name,
+                                    state: 'pending'
+                                }
+                            });
+
+                            await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
+                        });
                     }
                 }
             }
-        });
-
-        document.body.addEventListener('dragover', e => {
-            e.preventDefault();
-        });
-
-        document.body.addEventListener('dragenter', e => {
-            e.preventDefault();
-        });
-
-        document.body.addEventListener('dragleave', e => {
-            e.preventDefault();
-        });
+        }
     };
-
-    init();
 
     createEffect(() => {
         refreshList(true);
@@ -272,7 +256,20 @@ export const FileList = (props: FileListProps) => {
         <FileListContext.Provider
             value={context}>
             <Stack
-                sx={props.sx}>
+                sx={props.sx}
+                onDrop={onDrop}
+                onDragOver={e => {
+                    e.preventDefault();
+                    // console.log('1');
+                }}
+                onDragEnter={e => {
+                    e.preventDefault();
+                    console.log(e);
+                }}
+                onDragLeave={e => {
+                    e.preventDefault();
+                    console.log('3');
+                }}>
 
                 <FunctionBar
                     onUploadClick={() => {
