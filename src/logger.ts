@@ -44,7 +44,7 @@ export function sendError<T extends cloud.protocol.storage.Response>(res: core.R
     if (isError(e)) {
         logger.error(e);
 
-        res.status(400).send({
+        res.status(204).send({
             error: {
                 message: e.message
             }
@@ -53,7 +53,7 @@ export function sendError<T extends cloud.protocol.storage.Response>(res: core.R
         const error = new Error(`Unknown error.\n${JSON.stringify(e, null, 4)}`);
         logger.error(error);
 
-        res.status(400).send({
+        res.status(204).send({
             error: {
                 message: 'unknown error'
             }

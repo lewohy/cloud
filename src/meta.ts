@@ -28,7 +28,6 @@ export function getMeta(location: cloud.Location): cloud.Meta {
 // TODO: 이 함수의 동기화 설정이 필요함
 // 절대로 이 함수의 callback은 동시에 두 번 이상 호출되어서는 안 됨
 export async function modifyMeta(location: cloud.Location, callback: (meta: cloud.Meta) => Promise<cloud.Meta>): Promise<cloud.Meta> {
-
     return new Promise(async (resolve, reject) => {
         try {
             const meta = getMeta(location);
