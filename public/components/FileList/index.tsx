@@ -115,7 +115,7 @@ export const FileList = (props: FileListProps) => {
             console.error(error);
         }
     };
-    
+
     const renameItem = async (name: string, newName: string) => {
         try {
             const result = await cr.put(`/api/storage/${cr.getPathString(props.location)}/${name}`, {
@@ -261,7 +261,8 @@ export const FileList = (props: FileListProps) => {
     });
 
     return (
-        <FileListContext.Provider value={context}>
+        <FileListContext.Provider
+            value={context}>
             <Stack
                 sx={props.sx}>
 
@@ -359,6 +360,7 @@ export const FileList = (props: FileListProps) => {
                                             }, {
                                                 message: 'Enter new name',
                                                 label: 'New name',
+                                                default: name
                                             });
 
                                             if (result.response === 'positive') {

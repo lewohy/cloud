@@ -17,10 +17,11 @@ interface PromptDialogReturns {
 interface PromptDialogProps {
     message: string;
     label?: string;
+    default?: string;
 }
 
 const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props: PromptDialogProps) => {
-    const [value, setValue] = createSignal('');
+    const [value, setValue] = createSignal(props.default ?? '');
 
     const dialog = useDialog<PromptDialogReturns>();
 

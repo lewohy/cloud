@@ -39,20 +39,6 @@ const logger = winston.createLogger({
     )
 });
 
-const debugLogger = winston.createLogger({
-    level: 'debug',
-    transports: [
-        new winston.transports.File({
-            filename: config.log.debug
-        })
-    ],
-    format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json(),
-        winston.format.prettyPrint(),
-    )
-});
-
 // REVIEW: 함수 위치 바꿔야할듯
 export function sendError<T extends cloud.protocol.storage.Response>(res: core.Response<T>, e: unknown): void {
     if (isError(e)) {

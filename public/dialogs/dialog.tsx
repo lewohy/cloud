@@ -84,7 +84,8 @@ export function SmulogContainer(props: { children: JSX.Element }) {
     };
 
     return (
-        <SmulogContainerContext.Provider value={context}>
+        <SmulogContainerContext.Provider
+            value={context}>
             <>
                 {props.children}
                 <For each={smulogDataList()}>

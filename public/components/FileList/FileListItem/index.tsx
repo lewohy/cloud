@@ -13,6 +13,7 @@ import { FileListItemMenu } from './FileListItemMenu';
 import { useDialogContainer } from '~/public/dialogs/dialog';
 import promptDialog from '~/public/dialogs/PromptDialog';
 import alertDialog from '~/public/dialogs/AlertDialog';
+import { Folder, InsertDriveFileOutlined } from '@suid/icons-material';
 
 export interface FileListItemProps {
     name: string | null;
@@ -71,7 +72,7 @@ export const FileListItem = (props: FileListItemProps) => {
                         }>
                         <Match
                             when={item()?.type === 'directory'}>
-                            <FolderOutlined
+                            <Folder
                                 sx={{
                                     fontSize: '48px'
                                 }} />
@@ -79,7 +80,7 @@ export const FileListItem = (props: FileListItemProps) => {
 
                         <Match
                             when={item()?.type === 'file'}>
-                            <InsertDriveFile
+                            <InsertDriveFileOutlined
                                 sx={{
                                     fontSize: '48px'
                                 }} />
