@@ -49,6 +49,7 @@ export default function startUploadServer(app: core.Express) {
 
             let current = 0;
 
+            // NOTE: 이벤트가 순차적으로 실행되어야하는데 async면 잠재적으롬 문제있을거같음. 확인필요
             req.on('data', async (chunk: Buffer) => {
                 current += chunk.length;
                 // logger.info(`uploading... ${current}/${size}`);

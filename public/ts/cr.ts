@@ -1,5 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
+import { optimizeGetRequest } from './ro';
 
+// TODO: 위치 바꾸기
 function getFileFromFileEntry(fileEntry: FileSystemFileEntry): Promise<File> {
     return new Promise((resolve, reject) => {
         fileEntry.file(resolve, reject);
@@ -19,6 +21,9 @@ const cr = {
         } else {
             throw new Error(`Failed to get. status: ${response.status}, message: ${response.data?.error?.message}`);
         }
+    },
+    async getOptimized(url: string, negligible?: boolean): Promise<cloud.protocol.storage.GetResponse | null> {
+        return await optimizeGetRequest(url, negligible ?? false);
     },
     async post(url: string, request: cloud.protocol.storage.PostRequest): Promise<cloud.protocol.storage.PostResponse> {
         const response = await axios.post<

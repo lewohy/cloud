@@ -75,18 +75,20 @@ export const FileList = (props: FileListProps) => {
             setItemList(null);
         }
         try {
-            const response = await cr.get(`/api/storage/${cr.getPathString(props.location)}`);
+            const response = await cr.getOptimized(`/api/storage/${cr.getPathString(props.location)}`);
 
-            if (response.items !== undefined) {
-                setItemList(response.items.sort((a, b) => {
-                    if (a.type === 'directory' && b.type === 'file') {
-                        return -1;
-                    } else if (a.type === 'file' && b.type === 'directory') {
-                        return 1;
-                    }
+            if (response !== null) {
+                if (response.items !== undefined) {
+                    setItemList(response.items.sort((a, b) => {
+                        if (a.type === 'directory' && b.type === 'file') {
+                            return -1;
+                        } else if (a.type === 'file' && b.type === 'directory') {
+                            return 1;
+                        }
 
-                    return a.name.localeCompare(b.name);
-                }));
+                        return a.name.localeCompare(b.name);
+                    }));
+                }
             }
         } catch (error) {
             // TODO: 요청 실패 처리하기
