@@ -100,7 +100,11 @@ export const Storage = (props: StorageProps) => {
                                     navigate(`/storage/${location().scope}/${location().path.slice(0, -1).join('/')}`);
                                 }}
                                 onItemClick={item => {
-                                    navigate(`/storage/${location().scope}/${location().path.concat(item.name).join('/')}`);
+                                    if (item.type === 'directory') {
+                                        navigate(`/storage/${location().scope}/${location().path.join('/')}/${item.name}`);
+                                    } else {
+                                        window.open(`/storage/${location().scope}/${location().path.concat(item.name).join('/')}`);
+                                    }
                                 }} />
                         </Stack>
                     </Container>
