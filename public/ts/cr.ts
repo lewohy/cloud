@@ -62,21 +62,25 @@ const cr = {
         }
     },
     async upload(url: string, fileEntry: FileSystemFileEntry): Promise<cloud.protocol.storage.UploadResponse> {
-        const response = await axios.post<
-            cloud.protocol.storage.UploadResponse,
-            AxiosResponse<cloud.protocol.storage.UploadResponse>,
-            cloud.protocol.storage.UploadRequest>(url, await getFileFromFileEntry(fileEntry), {
-                headers: {
-                    'filename': encodeURI(fileEntry.name),
-                }
-            });
+        window.onbeforeunload = () => "";
+        try {
+            const response = await axios.post<
+                cloud.protocol.storage.UploadResponse,
+                AxiosResponse<cloud.protocol.storage.UploadResponse>,
+                cloud.protocol.storage.UploadRequest>(url, await getFileFromFileEntry(fileEntry), {
+                    headers: {
+                        'filename': encodeURI(fileEntry.name),
+                    }
+                });
 
-        if (response.status === 200) {
-            return response.data;
-        } else {
-            throw new Error(`Failed to upload file. status: ${response.status}, message: ${response.data?.error?.message}`);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                throw new Error(`Failed to upload file. status: ${response.status}, message: ${response.data?.error?.message}`);
+            }
+        } finally {
+            window.onbeforeunload = null;
         }
-
     },
     // TODO: 함수 위치 바꾸기
     getPathString(location: cloud.Location): string {
