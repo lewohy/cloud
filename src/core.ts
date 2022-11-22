@@ -24,7 +24,14 @@ export function getLocation(req: core.Request): cloud.Location {
 
 export function getBaseLocation(location: cloud.Location): cloud.Location {
     if (location.path.length === 0) {
-        throw new Error(`Cannt get base location of ${location.scope}/${location.path.join('/')}`);
+        if (location.scope.length === 0) {
+            throw new Error(`Cannt get base location of ${location.scope}/${location.path.join('/')}`);
+        }
+
+        return {
+            scope: '',
+            path: []
+        };
     }
 
     return {
