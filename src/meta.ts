@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import config from '~/config.json';
-import { getPathString } from './core';
+import { getBaseLocation, getPathString } from './core';
 
 interface MetaModification {
     location: cloud.Location;
@@ -47,7 +47,18 @@ export async function modifyMeta(location: cloud.Location, callback: (meta: clou
     });
 }
 
-function getAbsoluteBasePath(location: cloud.Location): string {
+export function getItem(location: cloud.Location): cloud.Item | undefined {
+    const path = [location.scope, ...location.path];
+
+    if (path.length === 0) {
+        throw new Error('Cannot get item of storage root.');
+    }
+    const base = getBaseLocation(location);
+
+    return getMeta(base).items.find(item => item.name == path.slice(-1)[0]);
+};
+
+export function getAbsoluteBasePath(location: cloud.Location): string {
     const arr = [location.scope, ...location.path];
 
     for (let i = 1; i < arr.length; i += 2) {
