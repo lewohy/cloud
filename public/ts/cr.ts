@@ -1,13 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { optimizeGetRequest } from './ro';
 
-// TODO: 위치 바꾸기
-function getFileFromFileEntry(fileEntry: FileSystemFileEntry): Promise<File> {
-    return new Promise((resolve, reject) => {
-        fileEntry.file(resolve, reject);
-    });
-}
-
 // TODO: 이름바꾸기
 const cr = {
     async get(url: string): Promise<cloud.protocol.storage.GetResponse> {
@@ -61,15 +54,15 @@ const cr = {
             throw new Error(`Failed to delete. status: ${response.status}, message: ${response.data?.error?.message}`);
         }
     },
-    async upload(url: string, fileEntry: FileSystemFileEntry): Promise<cloud.protocol.storage.UploadResponse> {
+    async upload(url: string, file: File): Promise<cloud.protocol.storage.UploadResponse> {
         window.onbeforeunload = () => "";
         try {
             const response = await axios.post<
                 cloud.protocol.storage.UploadResponse,
                 AxiosResponse<cloud.protocol.storage.UploadResponse>,
-                cloud.protocol.storage.UploadRequest>(url, await getFileFromFileEntry(fileEntry), {
+                cloud.protocol.storage.UploadRequest>(url, file, {
                     headers: {
-                        'filename': encodeURI(fileEntry.name),
+                        'filename': encodeURI(file.name),
                     }
                 });
 

@@ -54,7 +54,6 @@ export default function startAPIServer(app: core.Express) {
             const name = location.path[location.path.length - 1];
             const request = req.body as cloud.protocol.storage.PutRequest;
 
-            // TODO: 테스트하기
             await renameItem(getBaseLocation(location), name, request.name);
             res.status(200).send();
         } catch (e) {
@@ -67,7 +66,6 @@ export default function startAPIServer(app: core.Express) {
             const location = getLocation(req);
             const name = location.path[location.path.length - 1];
 
-            // TODO: 테스트하기
             if (!isString(name)) {
                 throw new Error(`Invalid request. filename: ${name}`);
             }

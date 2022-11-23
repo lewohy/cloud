@@ -16,7 +16,6 @@ export interface ScrollViewProps {
 
 }
 
-// TODO: 스크롤바의 최소 크기 설정하기
 export const ScrollView = (props: ScrollViewProps) => {
     const theme = useTheme();
 

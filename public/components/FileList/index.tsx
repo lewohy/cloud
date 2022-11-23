@@ -14,6 +14,7 @@ import { Theme } from "@suid/system/createTheme";
 import { isDirectoryEntry, isFileEntry } from '~/public/ts/typeguard';
 import { checkListDialog } from '~/public/dialogs/CheckListDialog';
 import alertDialog from '~/public/dialogs/AlertDialog';
+import { useTheme } from '@suid/material';
 
 
 interface FileListContext {
@@ -52,6 +53,8 @@ export const FileList = (props: FileListProps) => {
         return itemList()?.map((item) => item.name) ?? null;
     });
 
+    const theme = useTheme();
+
     const smulogContainer = useDialogContainer();
     const socket = createMemo<Socket | null>(prev => {
         prev?.disconnect();
@@ -75,7 +78,9 @@ export const FileList = (props: FileListProps) => {
             setItemList(null);
         }
         try {
-            const response = await cr.getOptimized(`/api/storage/${cr.getPathString(props.location)}`);
+            const response = reload ?
+                await cr.get(`/api/storage/${cr.getPathString(props.location)}`) :
+                await cr.getOptimized(`/api/storage/${cr.getPathString(props.location)}`);
 
             if (response !== null) {
                 if (response.items !== undefined) {
@@ -174,7 +179,6 @@ export const FileList = (props: FileListProps) => {
     };
 
     const getDuplicateFileList = async (entryList: FileSystemFileEntry[]): Promise<FileSystemFileEntry[]> => {
-        // TODO: Promise all사용으로 시간 단축하기
         const duplicated = (await Promise.all(entryList.map(async entry => {
             const meta = await getItemMeta(entry);
 
@@ -191,6 +195,24 @@ export const FileList = (props: FileListProps) => {
             }, reject);
         });
     };
+
+    const getFileFromFileEntry = (fileEntry: FileSystemFileEntry): Promise<File> => {
+        return new Promise((resolve, reject) => {
+            fileEntry.file(resolve, reject);
+        });
+    };
+
+    const getSelectedFileListByUser = (): Promise<File[]> => {
+        return new Promise((resolve, rejet) => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.addEventListener('change', e => {
+                resolve(Array.from(input.files ?? []));
+            });
+            input.click();
+        });
+    }
 
     const onDrop = async (e: DragEvent) => {
         e.preventDefault();
@@ -212,7 +234,7 @@ export const FileList = (props: FileListProps) => {
                         }
                     });
 
-                    await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
+                    await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, await getFileFromFileEntry(fileEntry));
                 });
             } else {
                 const result = await checkListDialog.show(smulogContainer, {
@@ -235,7 +257,7 @@ export const FileList = (props: FileListProps) => {
                                 }
                             });
 
-                            await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, fileEntry);
+                            await cr.upload(`/upload/storage/${cr.getPathString(props.location)}${(await getParentEntry(fileEntry)).fullPath}`, await getFileFromFileEntry(fileEntry));
                         });
                     }
                 }
@@ -248,7 +270,6 @@ export const FileList = (props: FileListProps) => {
     });
 
     createEffect(() => {
-        // TODO: refresh일때는 skeleton 안보여주기
         socket()?.on('refresh', () => {
             refreshList(false);
         });
@@ -262,7 +283,6 @@ export const FileList = (props: FileListProps) => {
                 onDrop={onDrop}
                 onDragOver={e => {
                     e.preventDefault();
-                    // console.log('1');
                 }}
                 onDragEnter={e => {
                     e.preventDefault();
@@ -270,12 +290,24 @@ export const FileList = (props: FileListProps) => {
                 }}
                 onDragLeave={e => {
                     e.preventDefault();
-                    console.log('3');
                 }}>
 
                 <FunctionBar
-                    onUploadClick={() => {
-                        // TODO: 파일 업로드
+                    onUploadClick={async () => {
+                        const fileList = await getSelectedFileListByUser();
+                        
+                        // TODO: 중복 파일 처리하기
+                        fileList.forEach(async file => {
+                            await cr.post(`/api/storage/${cr.getPathString(props.location)}`, {
+                                entity: {
+                                    type: 'file',
+                                    name: file.name,
+                                    state: 'pending'
+                                }
+                            });
+
+                            await cr.upload(`/upload/storage/${cr.getPathString(props.location)}`, file);
+                        });
                     }}
                     onCreateFolderClick={async () => {
                         const result = await promptDialog.show(smulogContainer, {

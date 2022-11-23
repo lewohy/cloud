@@ -82,7 +82,6 @@ export const Storage = (props: StorageProps) => {
                                         text={location().scope} />
                                     <For each={location().path}>
                                         {(item: string, index: () => number) => (
-                                            // TODO: 매우 길어진 경우에 처리하기
                                             <PathItem
                                                 href={`/storage/${location().scope}/${location().path.slice(0, index() + 1).join('/')}`}
                                                 text={item} />

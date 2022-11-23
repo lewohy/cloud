@@ -249,7 +249,6 @@ export async function renameItem(location: cloud.Location, from: string, to: str
     return await modifyMeta(location, async (meta) => {
         const oldAbsolutePath = path.resolve(getAbsoluteContentsPath(location), from);
         const newAbsolutePath = path.resolve(getAbsoluteContentsPath(location), to);
-        // TODO: 여기 작업하기
 
         const file = meta.items.find((e) => e.name === from);
         if (file === undefined) {

@@ -165,6 +165,6 @@ export const FileListItem = (props: FileListItemProps) => {
                         onDelete={props.onDelete} />
                 </Show>
             </Stack>
-        </RippleBase >
+        </RippleBase>
     );
 };
