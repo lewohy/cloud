@@ -66,7 +66,9 @@ export async function createNormalDirectory(location: cloud.Location, entity: cl
             });
 
             fs.writeFileSync(path.resolve(absolutePath, entity.name, config.path.storage.meta.name), JSON.stringify({
-                items: []
+                // TODO: 기본 meta내용 생성기 만들어서 쓰기. 그리고 typeing과 동기화시키기
+                items: [],
+                backups: []
             } as cloud.Meta, null, 4));
 
             meta.items.push({
@@ -129,6 +131,10 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
         const file = meta.items.find((e) => e.name === entity.name);
 
         if (file !== undefined) {
+            meta.backups.push({
+                ...file
+            });
+
             if (isFile(file)) {
                 file.createdTime = dayjs().valueOf();
                 file.state = 'pending';
@@ -294,6 +300,31 @@ export async function commitFile(location: cloud.Location, filename: string): Pr
         file.state = 'normal';
 
         logger.info(`Commit file success. ${absoluteTempPath} -> ${absoluteContentsPath}`);
+
+        meta.backups = meta.backups.filter((e) => e.name !== filename);
+
+        return meta;
+    });
+}
+
+export async function rollbackFile(location: cloud.Location, filename: string): Promise<cloud.Meta> {
+    return await modifyMeta(location, async (meta) => {
+        const absoluteTempPath = path.resolve(getAbsoluteTempPath(location), filename);
+        const absoluteContentsPath = path.resolve(getAbsoluteContentsPath(location), filename);
+
+        logger.info(`Rollback file. ${absoluteTempPath} -> ${absoluteContentsPath}`);
+
+        deleteTempFile(location, filename);
+
+        const fileIndex = meta.items.findIndex((e) => e.name === filename);
+        const backupIndex = meta.backups.findIndex((e) => e.name === filename);
+
+        if (backupIndex >= 0) {
+            meta.items[fileIndex] = meta.backups[backupIndex];
+            meta.backups = meta.backups.filter((e) => e.name !== filename);
+        } else {
+            meta.items = meta.items.filter((e) => e.name !== filename);
+        }
 
         return meta;
     });

@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
 import dayjs from 'dayjs';
 import * as core from 'express-serve-static-core';
-import { commitFile, deleteTempFile, getLocation, getPathString, writeToTemp } from '~/src/core';
+import { commitFile, deleteTempFile, getLocation, getPathString, rollbackFile, writeToTemp } from '~/src/core';
 import { isFile, isNumber, isString } from '~/src/typguard';
 import logger, { sendError } from '~/src/logger';
 import { modifyMeta } from '~/src/meta';
@@ -57,6 +57,8 @@ export default function startUploadServer(app: core.Express) {
             }).on('end', async () => {
                 await commitFile(location, filename);
                 res.status(200).send();
+            }).on('error', async (e) => {
+                await rollbackFile(location, filename);
             });
         } catch (e) {
             sendError(res, e);

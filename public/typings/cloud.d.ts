@@ -30,6 +30,7 @@ declare global {
 
         interface Meta {
             items: cloud.Item[];
+            backups: cloud.Item[];
         }
 
         namespace protocol {
