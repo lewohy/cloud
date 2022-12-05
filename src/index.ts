@@ -15,7 +15,9 @@ import http from 'http';
 async function createServer() {
     const app = express();
     const server = http.createServer(app);
-    const viteServer = await vite.createServer();
+    const viteServer = await vite.createServer({
+        configFile: './vite.config.ts'
+    });
 
     // TODO: 이거 수정
     app.use(async (req, res, next) => {

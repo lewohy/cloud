@@ -5,7 +5,8 @@
         "./package.json",
         "./tsconfig.json",
         "./nodemon.json",
-        "./config.json"
+        "./config.json",
+        "./vite.config.ts"
     ],
     "ext": "js,jsx,ts,tsx,json",
     "exec": "node --loader ts-node/esm -r tsconfig-paths/register ./src/index.ts"

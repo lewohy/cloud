@@ -6,7 +6,7 @@ import suidPlugin from "@suid/vite-plugin";
 export default defineConfig({
     plugins: [solidPlugin(), suidPlugin()],
     build: {
-        target: 'esnext',
+        target: 'esnext'
     },
     resolve: {
         alias: {
