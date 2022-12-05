@@ -32,7 +32,7 @@ const theme = createTheme({
         }
     },
     typography: {
-        fontFamily: `'Roboto', 'Noto Sans KR', sans-serif`
+        fontFamily: `'Noto Sans KR', sans-serif`
     }
 });
 
