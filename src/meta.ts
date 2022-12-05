@@ -1,7 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import { Mutex } from 'async-mutex';
 import config from '~/config.json';
 import { getBaseLocation, getPathString } from './core';
+import logger from './logger';
+
+const mutex = new Mutex();
 
 interface MetaModification {
     location: cloud.Location;
@@ -16,19 +20,20 @@ export function observeMeta(observer: MetaModificationObserver) {
 };
 
 export function getMeta(location: cloud.Location): cloud.Meta {
-    const absolutePath = getAbsoluteMetaPath(location);
+    const absoluteMetaPath = getAbsoluteMetaPath(location);
 
-    if (!fs.existsSync(absolutePath)) {
+    if (!fs.existsSync(absoluteMetaPath)) {
+        logger.error(`Meta file not found: ${absoluteMetaPath}`);
         throw new Error(`Cannot Not found meta base folder. ${getPathString(location)}`);
     }
 
-    return JSON.parse(fs.readFileSync(absolutePath, 'utf-8'));
+    return JSON.parse(fs.readFileSync(absoluteMetaPath, 'utf-8'));
 };
 
-// TODO: 이 함수의 동기화 설정이 필요함
-// 절대로 이 함수의 callback은 동시에 두 번 이상 호출되어서는 안 됨
 export async function modifyMeta(location: cloud.Location, callback: (meta: cloud.Meta) => Promise<cloud.Meta>): Promise<cloud.Meta> {
     return new Promise(async (resolve, reject) => {
+        const release = await mutex.acquire();
+        logger.info(`lock mutex for ${getPathString(location)}`);
         try {
             const meta = getMeta(location);
             const newMeta = await callback(meta);
@@ -43,6 +48,9 @@ export async function modifyMeta(location: cloud.Location, callback: (meta: clou
             resolve(newMeta);
         } catch (e) {
             reject(e);
+        } finally {
+            release();
+            logger.info(`unlock mutex for ${getPathString(location)}`);
         }
     });
 }
