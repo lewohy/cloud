@@ -42,7 +42,10 @@ export async function createShareId(location: cloud.Location): Promise<string> {
     const shareId = nanoid();
     
     await modifyShare(async (share) => {
-        share[shareId] = location;
+        share[shareId] = {
+            location
+        };
+
         return share;
     });
 
@@ -57,7 +60,7 @@ export async function getShareIdByLocation(location: cloud.Location): Promise<st
     for (let i = 0; i < idList.length; i++) {
         const id = idList[i];
         const shareItem = share[id];
-        if (getPathString(shareItem) === getPathString(location)) {
+        if (getPathString(shareItem.location) === getPathString(location)) {
             return id;
         }
     }
@@ -69,7 +72,7 @@ export function getLocationByShareId(shareId: string): cloud.Location | null {
     const share = getShare();
     const shareItem = share[shareId];
     if (shareItem) {
-        return shareItem;
+        return shareItem?.location;
     }
     return null;
 }

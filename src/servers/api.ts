@@ -4,6 +4,7 @@ import logger, { sendError } from '~/src/logger';
 import { isString } from '~/src/typguard';
 import { sleep } from '../test';
 import { getMeta } from '~/src/meta';
+import { createShareId } from '../share';
 
 export default function startAPIServer(app: core.Express) {
     // NOTE: storage api 서버
@@ -72,6 +73,20 @@ export default function startAPIServer(app: core.Express) {
 
             await deleteItem(getBaseLocation(location), name);
             res.status(200).send();
+        } catch (e) {
+            sendError(res, e);
+        }
+    });
+
+    app.post<{}, cloud.protocol.share.PostResponse, cloud.protocol.share.PostRequest>(/\/api\/share\/([^\/]+)(\/(.*))?/, async (req, res) => {
+        try {
+            const location = getLocation(req);
+
+            const shareId = await createShareId(location);
+
+            res.status(200).send({
+                shareId
+            });
         } catch (e) {
             sendError(res, e);
         }
