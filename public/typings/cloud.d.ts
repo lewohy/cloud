@@ -17,6 +17,7 @@ declare global {
         }
 
         interface Directory extends cloud.Entity {
+            id: string;
             createdTime: number;
         }
 
@@ -26,11 +27,15 @@ declare global {
             uploaded: number;
         }
 
-        type Item = cloud.File | cloud.Directory;
+        type Item = cloud.File | cloud.Directory
 
         interface Meta {
             items: cloud.Item[];
             backups: cloud.Item[];
+        }
+
+        interface Share {
+            [id: string]: cloud.Location;
         }
 
         namespace protocol {
@@ -41,6 +46,20 @@ declare global {
             namespace socketio {
                 interface Query {
                     room: string;
+                }
+            }
+
+            namespace scope {
+                interface Response {
+                    error?: cloud.protocol.Error;
+                }
+
+                interface GetRequest {
+
+                }
+
+                interface GetResponse extends Response {
+                    scopeList: string[];
                 }
             }
 
