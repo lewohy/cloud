@@ -35,7 +35,9 @@ declare global {
         }
 
         interface Share {
-            [id: string]: cloud.Location;
+            [id: string]: {
+                location: cloud.Location;
+            };
         }
 
         namespace protocol {
@@ -60,6 +62,20 @@ declare global {
 
                 interface GetResponse extends Response {
                     scopeList: string[];
+                }
+            }
+
+            namespace share {
+                interface Response {
+                    error?: cloud.protocol.Error;
+                }
+
+                interface PostRequest {
+                    
+                }
+
+                interface PostResponse extends Response {
+                    shareId: string;
                 }
             }
 
