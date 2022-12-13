@@ -18,7 +18,8 @@ import { useTheme } from '@suid/material';
 
 
 interface FileListContext {
-    getItem(name: string | null): cloud.Item | undefined;
+    getItem(name: string | null): cloud.Item | null;
+    getLocation(): cloud.Location;
 }
 
 const FileListContext = createContext<FileListContext>();
@@ -53,8 +54,6 @@ export const FileList = (props: FileListProps) => {
         return itemList()?.map((item) => item.name) ?? null;
     });
 
-    const theme = useTheme();
-
     const smulogContainer = useDialogContainer();
     const socket = createMemo<Socket | null>(prev => {
         prev?.disconnect();
@@ -69,7 +68,12 @@ export const FileList = (props: FileListProps) => {
 
     const context: FileListContext = {
         getItem(name: string) {
-            return itemList()?.find(item => item.name === name);
+            const item = itemList()?.find(item => item.name === name);
+
+            return item ?? null;
+        },
+        getLocation() {
+            return props.location;
         }
     };
 
@@ -125,26 +129,6 @@ export const FileList = (props: FileListProps) => {
                     state: 'normal'
                 }
             });
-        } catch (error) {
-            // TODO: 요청 실패 처리하기
-            console.error(error);
-        }
-    };
-
-    const renameItem = async (name: string, newName: string) => {
-        try {
-            const result = await cr.put(`/api/storage/${cr.getPathString(props.location)}/${name}`, {
-                name: newName
-            });
-        } catch (error) {
-            // TODO: 요청 실패 처리하기
-            console.error(error);
-        }
-    };
-
-    const deleteItem = async (name: string) => {
-        try {
-            const result = await cr.delete(`/api/storage/${cr.getPathString(props.location)}/${name}`);
         } catch (error) {
             // TODO: 요청 실패 처리하기
             console.error(error);
@@ -385,39 +369,9 @@ export const FileList = (props: FileListProps) => {
                                             if (name !== null) {
                                                 const item = context.getItem(name);
 
-                                                if (item === undefined) {
-                                                    throw new Error('Item is undefined');
+                                                if (item !== null) {
+                                                    props.onItemClick?.(item);
                                                 }
-
-                                                props.onItemClick?.(item);
-                                            }
-                                        }}
-                                        onRename={async () => {
-                                            const result = await promptDialog.show(smulogContainer, {
-                                                title: 'Rename',
-                                                cancelOnTouchOutside: true,
-                                            }, {
-                                                message: 'Enter new name',
-                                                label: 'New name',
-                                                default: name
-                                            });
-
-                                            if (result.response === 'positive') {
-                                                if (result.returns !== undefined) {
-                                                    await renameItem(name, result.returns.value);
-                                                }
-                                            }
-                                        }}
-                                        onDelete={async () => {
-                                            const result = await alertDialog.show(smulogContainer, {
-                                                title: 'Delete',
-                                                cancelOnTouchOutside: true,
-                                            }, {
-                                                message: `'${name}' will be deleted. Are you sure?`,
-                                            });
-
-                                            if (result.response === 'positive') {
-                                                await deleteItem(name);
                                             }
                                         }} />
                                 );

@@ -1,11 +1,13 @@
-import { DeleteOutline, DeleteOutlined, DriveFileRenameOutline, MoreVert } from '@suid/icons-material';
+import { ContentCopy, ContentCut, DeleteOutline, DeleteOutlined, DriveFileRenameOutline, MoreVert } from '@suid/icons-material';
 import Fade from '@suid/material/Fade';
 import IconButton from '@suid/material/IconButton';
 import Popover from '@suid/material/Popover';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import { RippleBase } from '~/public/components/RippleBase';
-import { createSignal, For, JSX } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, JSX } from 'solid-js';
+import { useFileListItem } from '..';
+import { ListItemIcon, ListItemText, Menu, MenuItem, MenuList } from '@suid/material';
 
 export interface MenuItem {
     icon: JSX.Element;
@@ -18,8 +20,9 @@ export interface FileListItemMenuProps {
 }
 
 export const FileListItemMenu = (props: FileListItemMenuProps) => {
-    const [expend, setExpend] = createSignal(false);
     const [anchorEl, setAnchorEl] = createSignal<HTMLElement | null>(null);
+    const expend = createMemo(() => anchorEl() !== null);
+
     return (
         <Stack
             direction="row"
@@ -29,10 +32,9 @@ export const FileListItemMenu = (props: FileListItemMenuProps) => {
             }}>
 
             <IconButton
-                ref={setAnchorEl}
                 onClick={e => {
                     e.stopPropagation();
-                    setExpend(!expend());
+                    setAnchorEl(e.currentTarget);
                 }}
                 onMouseDown={e => {
                     e.stopPropagation();
@@ -40,58 +42,35 @@ export const FileListItemMenu = (props: FileListItemMenuProps) => {
                 <MoreVert />
             </IconButton>
 
-            <Popover
-                open={expend()}
+            <Menu
                 anchorEl={anchorEl()}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
+                open={expend()}
                 onClick={e => {
                     e.stopPropagation();
                 }}
                 onMouseDown={e => {
                     e.stopPropagation();
                 }}
-                onClose={e => {
-                    setExpend(false);
+                onClose={() => {
+                    setAnchorEl(null);
                 }}>
-                <Stack
-                    direction="column" >
-                    <For each={props.menuItemList}>
-                        {item => (
-                            <RippleBase>
-                                <Stack
-                                    sx={{
-                                        width: '100%',
-                                        padding: '8px',
-                                        justifyContent: 'flex-start'
-                                    }}
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        setExpend(false);
-                                        item.onClick();
-                                    }}
-                                    direction="row"
-                                    justifyContent="center"
-                                    spacing="8px" >
-
-                                    {item.icon}
-
-                                    <Typography
-                                        variant='body1'>
-                                        {item.text}
-                                    </Typography>
-                                </Stack>
-                            </RippleBase>
-                        )}
-                    </For>
-                </Stack>
-            </Popover>
-        </Stack>
+                <For each={props.menuItemList}>
+                    {item => (
+                        <MenuItem
+                            onClick={e => {
+                                setAnchorEl(null);
+                                item.onClick();
+                            }}>
+                            <ListItemIcon>
+                                {item.icon}
+                            </ListItemIcon>
+                            <ListItemText>
+                                {item.text}
+                            </ListItemText>
+                        </MenuItem>
+                    )}
+                </For>
+            </Menu>
+        </Stack >
     );
 };
