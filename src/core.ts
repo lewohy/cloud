@@ -9,6 +9,9 @@ import logger from './logger';
 import { getAbsoluteContentsPath, getAbsoluteTempPath, modifyMeta } from './meta';
 import { isFile, isString } from './typguard';
 
+/**
+ * 프로그램이 실행되면서 필요한 디렉토리 생성
+ */
 export function init() {
     const absoluteLogPath = path.resolve(config.log.base);
     const absoluteStoragePath = path.resolve(config.path.storage.name);
@@ -52,6 +55,11 @@ export function init() {
     }
 }
 
+/**
+ * request의 url을 파싱하여 scope와 path로 이루어진 객체 반환
+ * @param req express에서 제공하는 request 객체
+ * @returns 특정 위치를 가리키는 cloud.Location
+ */
 export function getLocation(req: core.Request): cloud.Location {
     if (!isString(req.params[0]) && !isString(req.params[1])) {
         throw new Error('Invalid location');
@@ -66,6 +74,12 @@ export function getLocation(req: core.Request): cloud.Location {
     };
 }
 
+/**
+ * 특정위치의 상위 위치 반환
+ * @throws 특정 위치가 최상위 위치일 경우 에러 발생
+ * @param location 특정 위치를 가리키는 cloud.Location
+ * @returns 상위 위치를 가리키는 cloud.Location
+ */
 export function getBaseLocation(location: cloud.Location): cloud.Location {
     if (location.path.length === 0) {
         if (location.scope.length === 0) {
@@ -84,10 +98,19 @@ export function getBaseLocation(location: cloud.Location): cloud.Location {
     };
 }
 
+/**
+ * cloud.Location을 path string으로 반환
+ * @param location 특정 위치를 가리키는 cloud.Location
+ * @returns path string
+ */
 export function getPathString(location: cloud.Location): string {
     return [location.scope, ...location.path].join('/');
 }
 
+/**
+ * 스코프 생성
+ * @param scope 사용할 scope 이름
+ */
 export async function createScope(scope: string): Promise<void> {
    await createNormalDirectory({
         scope: '',
@@ -99,6 +122,11 @@ export async function createScope(scope: string): Promise<void> {
     });
 };
 
+/**
+ * 특정 폴더에 일반 폴더 생성
+ * @param location 생성할 위치
+ * @param entity 생성할 폴더의 엔티티 정보
+ */
 export async function createNormalDirectory(location: cloud.Location, entity: cloud.Entity): Promise<void> {
     const create = async (location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> => {
         return await modifyMeta(location, async (meta) => {
@@ -158,6 +186,12 @@ export async function createNormalDirectory(location: cloud.Location, entity: cl
     }
 }
 
+/**
+ * 특정 위치에 파일 업로드
+ * @param location 생성할 위치
+ * @param entity 업로드 시킬 파일의 엔티티 정보
+ * @returns 수정된 해당 위치의 메타 정보
+ */
 export async function createPendingFile(location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> {
     if (location.path.length > 0) {
         await createNormalDirectory({
@@ -211,6 +245,12 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
     });
 }
 
+/**
+ * 특정 위치에 파일 생성
+ * @param location 생성할 위치
+ * @param entity 생성할 파일의 엔티티 정보
+ * @returns 수정된 해당 위치의 메타 정보
+ */
 export async function createNormalFile(location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> {
     if (location.path.length > 0) {
         await createNormalDirectory({
@@ -250,6 +290,11 @@ export async function createNormalFile(location: cloud.Location, entity: cloud.E
     });
 }
 
+/**
+ * 특정 위치에 대한 임시 파일 삭제
+ * @param location 삭제할 위치
+ * @param filename 삭제할 파일 이름
+ */
 export function deleteTempFile(location: cloud.Location, filename: string): void {
     const absolutePath = path.resolve(getAbsoluteTempPath(location), filename);
 
@@ -260,6 +305,13 @@ export function deleteTempFile(location: cloud.Location, filename: string): void
     }
 }
 
+/**
+ * 특정 위치에 대한 임시 파일에 데이터 추가
+ * @param location 파일의 위치
+ * @param filename 파일의 이름
+ * @param data 추가할 데이터
+ * @returns 수정된 해당 위치의 메타 정보
+ */
 export async function writeToTemp(location: cloud.Location, filename: string, data: Buffer): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
         if (meta.items.find((e) => e.name === filename) === undefined) {
@@ -281,6 +333,12 @@ export async function writeToTemp(location: cloud.Location, filename: string, da
     });
 }
 
+/**
+ * 특정 위치의 아이템 삭제
+ * @param location 삭제할 위치
+ * @param name 삭제할 아이템 이름
+ * @returns 수정된 해당 위치의 메타 정보
+ */
 export async function deleteItem(location: cloud.Location, name: string): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
         const absolutePath = path.resolve(getAbsoluteContentsPath(location), name);
@@ -306,6 +364,13 @@ export async function deleteItem(location: cloud.Location, name: string): Promis
     });
 }
 
+/**
+ * 특정 위치의 아이템 이름 수정
+ * @param location 파일의 위치
+ * @param from 원본 파일 이름
+ * @param to 수정할 파일 이름
+ * @returns 수정된 해당 위치의 메타 정보
+ */
 export async function renameItem(location: cloud.Location, from: string, to: string): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
         const oldAbsolutePath = path.resolve(getAbsoluteContentsPath(location), from);
@@ -330,6 +395,12 @@ export async function renameItem(location: cloud.Location, from: string, to: str
     });
 }
 
+/**
+ * 임시 파일을 커밋하고 메타 정보를 일반 파일로 수정
+ * @param location 커밋할 파일의 위치
+ * @param filename 커밋할 파일 이름
+ * @returns 수정된 해당 위치의 메타 정보
+ */
 export async function commitFile(location: cloud.Location, filename: string): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
         const absoluteTempPath = path.resolve(getAbsoluteTempPath(location), filename);
@@ -362,6 +433,12 @@ export async function commitFile(location: cloud.Location, filename: string): Pr
     });
 }
 
+/**
+ * 임시 파일을 삭제하고 백업된 파일로 롤백
+ * @param location 롤백할 파일의 위치
+ * @param filename 롤백할 파일 이름
+ * @returns 수정된 해당 위치의 메타 정보
+ */
 export async function rollbackFile(location: cloud.Location, filename: string): Promise<cloud.Meta> {
     return await modifyMeta(location, async (meta) => {
         const absoluteTempPath = path.resolve(getAbsoluteTempPath(location), filename);

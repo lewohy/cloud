@@ -39,7 +39,7 @@ const theme = createTheme({
 export const Storage = (props: StorageProps) => {
 
     const params = useParams<StorageParams>();
-    const location = createMemo(() => ({
+    const location = createMemo<cloud.Location>(() => ({
         scope: params.scope,
         path: params.path.length === 0 ? [] : params.path.split('/')
     }));
