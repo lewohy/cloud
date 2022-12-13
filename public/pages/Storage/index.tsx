@@ -101,7 +101,7 @@ export const Storage = (props: StorageProps) => {
                                 onItemClick={item => {
                                     if (item.type === 'directory') {
                                         // TODO: path와 item name을 한 배열에 넣고 join 하기
-                                        navigate(`/storage/${location().scope}/${location().path.join('/')}/${item.name}`);
+                                        navigate(`/storage/${location().scope}/${[...location().path, item.name].join('/')}`);
                                     } else {
                                         window.open(`/storage/${location().scope}/${location().path.concat(item.name).join('/')}`);
                                     }
