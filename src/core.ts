@@ -2,11 +2,55 @@ import dayjs from 'dayjs';
 import * as core from 'express-serve-static-core';
 
 import fs from 'fs';
+import { nanoid } from 'nanoid';
 import path from 'path';
 import config from '~/config.json';
 import logger from './logger';
 import { getAbsoluteContentsPath, getAbsoluteTempPath, modifyMeta } from './meta';
 import { isFile, isString } from './typguard';
+
+export function init() {
+    const absoluteLogPath = path.resolve(config.log.base);
+    const absoluteStoragePath = path.resolve(config.path.storage.name);
+    const absoulutePreferencePath = path.resolve(config.path.preference.name);
+
+    if (!fs.existsSync(absoluteLogPath)) {
+        fs.mkdirSync(absoluteLogPath, {
+            recursive: true
+        });
+
+        logger.info(`Created log directory: ${absoluteLogPath}`);
+    }
+
+    if (!fs.existsSync(absoluteStoragePath)) {
+        fs.mkdirSync(absoluteStoragePath, {
+            recursive: true
+        });
+
+        logger.info(`Created storage directory: ${absoluteStoragePath}`);
+
+        fs.writeFileSync(path.resolve(absoluteStoragePath, config.path.storage.meta.name), JSON.stringify({
+            items: [],
+            backups: []
+        }, null, 4));
+
+        logger.info(`Created meta file: ${path.resolve(absoluteStoragePath, config.path.storage.meta.name)}`);
+    }
+    
+    if (!fs.existsSync(absoulutePreferencePath)) {
+        fs.mkdirSync(absoulutePreferencePath, {
+            recursive: true
+        });
+
+        logger.info(`Created preference directory: ${absoulutePreferencePath}`);
+
+        fs.writeFileSync(path.resolve(absoulutePreferencePath, config.path.preference.share.name), JSON.stringify({
+            shares: []
+        }, null, 4));
+
+        logger.info(`Created share file: ${path.resolve(absoulutePreferencePath, config.path.preference.share.name)}`);
+    }
+}
 
 export function getLocation(req: core.Request): cloud.Location {
     if (!isString(req.params[0]) && !isString(req.params[1])) {
@@ -29,7 +73,7 @@ export function getBaseLocation(location: cloud.Location): cloud.Location {
         }
 
         return {
-            scope: '',
+            scope: '', // REVIEW: .으로 바꿔야 하는건가?
             path: []
         };
     }
@@ -43,6 +87,17 @@ export function getBaseLocation(location: cloud.Location): cloud.Location {
 export function getPathString(location: cloud.Location): string {
     return [location.scope, ...location.path].join('/');
 }
+
+export async function createScope(scope: string): Promise<void> {
+   await createNormalDirectory({
+        scope: '',
+        path: []
+    }, {
+        type: 'directory',
+        name: scope,
+        state: 'normal'
+    });
+};
 
 export async function createNormalDirectory(location: cloud.Location, entity: cloud.Entity): Promise<void> {
     const create = async (location: cloud.Location, entity: cloud.Entity): Promise<cloud.Meta> => {
@@ -98,7 +153,7 @@ export async function createNormalDirectory(location: cloud.Location, entity: cl
 
             logger.info(`Directory ${[location.scope, ...paths.slice(0, i + 1)].join('/')} created.`);
         } catch (e) {
-            logger.warn(`Directory already exists. ${[location.scope, ...paths.slice(0, i + 1)].join('/')}`);
+            logger.error(`Directory already exists. ${[location.scope, ...paths.slice(0, i + 1)].join('/')}`);
         }
     }
 }
@@ -189,7 +244,7 @@ export async function createNormalFile(location: cloud.Location, entity: cloud.E
             uploaded: 0
         } as cloud.File);
 
-        logger.info(`Normal file ${absolutePath} created.`);
+        logger.info(`Normal file ${absolutePath}/${entity.name} created.`);
 
         return meta;
     });
