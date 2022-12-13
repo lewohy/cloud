@@ -1,50 +1,35 @@
-import { DeleteOutline, DriveFileRenameOutline, MoreVert } from '@suid/icons-material';
+import { DeleteOutline, DeleteOutlined, DriveFileRenameOutline, MoreVert } from '@suid/icons-material';
 import Fade from '@suid/material/Fade';
 import IconButton from '@suid/material/IconButton';
+import Popover from '@suid/material/Popover';
 import Stack from '@suid/material/Stack';
-import { createSignal, Show } from 'solid-js';
+import Typography from '@suid/material/Typography';
+import { RippleBase } from '~/public/components/RippleBase';
+import { createSignal, For, JSX } from 'solid-js';
+
+export interface MenuItem {
+    icon: JSX.Element;
+    text: string;
+    onClick: () => void;
+}
 
 export interface FileListItemMenuProps {
-    onRename?: () => void;
-    onDelete?: () => void;
+    menuItemList: MenuItem[];
 }
 
 export const FileListItemMenu = (props: FileListItemMenuProps) => {
     const [expend, setExpend] = createSignal(false);
-
+    const [anchorEl, setAnchorEl] = createSignal<HTMLElement | null>(null);
     return (
         <Stack
-            direction="row">
-
-            <Fade
-                in={expend()}>
-                <Stack
-                    direction="row">
-                    <IconButton
-                        onClick={e => {
-                            e.stopPropagation();
-                            props.onRename?.();
-                        }}
-                        onMouseDown={e => {
-                            e.stopPropagation();
-                        }}>
-                        <DriveFileRenameOutline />
-                    </IconButton>
-
-                    <IconButton
-                        onClick={e => {
-                            e.stopPropagation();
-                            props.onDelete?.();
-                        }}
-                        onMouseDown={e => {
-                            e.stopPropagation();
-                        }}>
-                        <DeleteOutline />
-                    </IconButton>
-                </Stack>
-            </Fade>
+            direction="row"
+            sx={{
+                width: '40px',
+                height: '40px',
+            }}>
 
             <IconButton
+                ref={setAnchorEl}
                 onClick={e => {
                     e.stopPropagation();
                     setExpend(!expend());
@@ -54,6 +39,59 @@ export const FileListItemMenu = (props: FileListItemMenuProps) => {
                 }}>
                 <MoreVert />
             </IconButton>
+
+            <Popover
+                open={expend()}
+                anchorEl={anchorEl()}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                onClick={e => {
+                    e.stopPropagation();
+                }}
+                onMouseDown={e => {
+                    e.stopPropagation();
+                }}
+                onClose={e => {
+                    setExpend(false);
+                }}>
+                <Stack
+                    direction="column" >
+                    <For each={props.menuItemList}>
+                        {item => (
+                            <RippleBase>
+                                <Stack
+                                    sx={{
+                                        width: '100%',
+                                        padding: '8px',
+                                        justifyContent: 'flex-start'
+                                    }}
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        setExpend(false);
+                                        item.onClick();
+                                    }}
+                                    direction="row"
+                                    justifyContent="center"
+                                    spacing="8px" >
+
+                                    {item.icon}
+
+                                    <Typography
+                                        variant='body1'>
+                                        {item.text}
+                                    </Typography>
+                                </Stack>
+                            </RippleBase>
+                        )}
+                    </For>
+                </Stack>
+            </Popover>
         </Stack>
     );
 };

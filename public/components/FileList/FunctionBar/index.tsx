@@ -1,9 +1,7 @@
 import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
-import Add from "@suid/icons-material/Add"
-import InsertDriveFile from "@suid/icons-material/InsertDriveFile"
 import Upload from "@suid/icons-material/Upload"
-import Folder from '@suid/icons-material/Folder';
+import { CreateNewFolder, CreateNewFolderOutlined, NoteAdd, NoteAddOutlined } from '@suid/icons-material';
 
 export interface FunctionBarProps {
     onUploadClick: () => void;
@@ -34,8 +32,7 @@ export const FunctionBar = (props: FunctionBarProps) => {
                 <Stack
                     direction="row"
                     spacing={1}>
-                    <Add/>
-                    <InsertDriveFile/>
+                    <NoteAdd/>
                 </Stack>
             </Button>
             <Button
@@ -45,8 +42,7 @@ export const FunctionBar = (props: FunctionBarProps) => {
                 <Stack
                     direction="row"
                     spacing={1}>
-                    <Add/>
-                    <Folder/> 
+                    <CreateNewFolder/> 
                 </Stack>
             </Button>
         </Stack>

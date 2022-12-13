@@ -24,7 +24,7 @@ export function getMeta(location: cloud.Location): cloud.Meta {
 
     if (!fs.existsSync(absoluteMetaPath)) {
         logger.error(`Meta file not found: ${absoluteMetaPath}`);
-        throw new Error(`Cannot Not found meta base folder. ${getPathString(location)}`);
+        throw new Error(`Cannot not found meta file. ${getPathString(location)}`);
     }
 
     return JSON.parse(fs.readFileSync(absoluteMetaPath, 'utf-8'));
@@ -33,7 +33,7 @@ export function getMeta(location: cloud.Location): cloud.Meta {
 export async function modifyMeta(location: cloud.Location, callback: (meta: cloud.Meta) => Promise<cloud.Meta>): Promise<cloud.Meta> {
     return new Promise(async (resolve, reject) => {
         const release = await mutex.acquire();
-        logger.info(`lock mutex for ${getPathString(location)}`);
+        logger.info(`lock mutex for ${getPathString(location)} while modifying meta.json`);
         try {
             const meta = getMeta(location);
             const newMeta = await callback(meta);
@@ -50,7 +50,7 @@ export async function modifyMeta(location: cloud.Location, callback: (meta: clou
             reject(e);
         } finally {
             release();
-            logger.info(`unlock mutex for ${getPathString(location)}`);
+            logger.info(`unlock mutex for ${getPathString(location)} while modifying meta.json`);
         }
     });
 }
@@ -67,13 +67,13 @@ export function getItem(location: cloud.Location): cloud.Item | undefined {
 };
 
 export function getAbsoluteBasePath(location: cloud.Location): string {
-    const arr = [location.scope, ...location.path];
+    const arr = [config.path.storage.name, ...(location.scope === '' ? location.path : [location.scope, ...location.path])];
 
     for (let i = 1; i < arr.length; i += 2) {
         arr.splice(i, 0, config.path.storage.contents.name);
     }
 
-    return path.resolve(config.path.storage.name, ...arr);
+    return path.resolve(...arr);
 }
 
 export function getAbsoluteContentsPath(location: cloud.Location): string {

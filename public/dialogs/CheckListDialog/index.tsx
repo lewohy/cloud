@@ -8,7 +8,6 @@ import ListItemIcon from '@suid/material/ListItemIcon';
 import ListItemText from '@suid/material/ListItemText';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
-import { RippleBase } from '~/public/components/RippleBase';
 import { createSignal, For } from 'solid-js';
 import { ScrollView } from '~/public/components/ScrollView';
 import { createSmulog, useDialog } from '~/public/dialogs/dialog';

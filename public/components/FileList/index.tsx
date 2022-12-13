@@ -7,7 +7,7 @@ import { createContext, createEffect, createMemo, createSignal, For, JSX, Match,
 import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
-import cr from '~/public/ts/cr';
+import cr from '~/public/ts/request/storage/cr';
 import { io, Socket } from 'socket.io-client';
 import { SxProps } from "@suid/system";
 import { Theme } from "@suid/system/createTheme";

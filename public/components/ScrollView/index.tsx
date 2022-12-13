@@ -13,6 +13,10 @@ export interface ScrollViewProps {
      * @default 4
      */
     padding?: number;
+    /**
+     * @default true
+     */
+    showScrollbar?: boolean;
 
 }
 
@@ -22,8 +26,9 @@ export const ScrollView = (props: ScrollViewProps) => {
     const [view, setView] = createSignal<HTMLDivElement | null>(null);
     const [content, setContent] = createSignal<HTMLDivElement | null>(null);
 
-    const padding = createMemo(() => props.padding ?? 4);
     const width = createMemo(() => props.width ?? 8);
+    const padding = createMemo(() => props.padding ?? 4);
+    const showScrollbar = createMemo(() => props.showScrollbar ?? true);
 
     return (
         <Stack
@@ -31,10 +36,12 @@ export const ScrollView = (props: ScrollViewProps) => {
             sx={{
                 width: '100%',
                 height: '100%',
+                paddingLeft: showScrollbar() ? `${width() + padding() * 2}px` : '0px',
                 overflowY: 'scroll',
                 '&::-webkit-scrollbar': {
                     width: `auto`,
-                    overflow: 'visible'
+                    overflow: 'visible',
+                    display: showScrollbar() ? 'block' : 'none'
                 },
                 '&::-webkit-scrollbar-button': {
                     width: '0px',
@@ -60,6 +67,9 @@ export const ScrollView = (props: ScrollViewProps) => {
                     background: 'transparent',
                     borderRadius: `${width() / 2}px`,
                     margin: `${padding()}px`,
+                },
+                '&::-webkit-scrollbar-corner': {
+                    background: 'transparent'
                 }
             }}>
             <Stack

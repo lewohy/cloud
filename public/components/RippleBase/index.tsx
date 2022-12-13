@@ -22,6 +22,9 @@ export const RippleBase = (props: RippleBaseProps) => {
 
     return (
         <ButtonBase
+            onMouseDown={e => {
+                e.stopPropagation();
+            }}
             {...props }/>
     );
 };

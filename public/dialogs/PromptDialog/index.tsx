@@ -4,11 +4,6 @@ import Typography from '@suid/material/Typography';
 import { createSmulog, useDialog } from '~/public/dialogs/dialog';
 import { createSignal } from 'solid-js';
 import Button from '@suid/material/Button';
-import List from '@suid/material/List';
-import { FileListItem } from 'components/FileList/FileListItem';
-import ListItem from '@suid/material/ListItem';
-import ListItemButton from '@suid/material/ListItemButton';
-import ListItemText from '@suid/material/ListItemText';
 
 interface PromptDialogReturns {
     value: string;
@@ -62,7 +57,8 @@ const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props
                 onChange={(event, value) => {
                     setValue(value);
                 }}
-                label={props.label} />
+                label={props.label}
+                />
         </Stack>
     );
 });
