@@ -2,7 +2,7 @@ import Stack from '@suid/material/Stack';
 import TextField from '@suid/material/TextField';
 import Typography from '@suid/material/Typography';
 import { createSmulog, useDialog } from '~/public/dialogs/dialog';
-import { createSignal } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 import Button from '@suid/material/Button';
 
 interface PromptDialogReturns {
@@ -16,9 +16,14 @@ interface PromptDialogProps {
 }
 
 const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props: PromptDialogProps) => {
+    const [input, setInput] = createSignal<HTMLInputElement>(null!);
     const [value, setValue] = createSignal(props.default ?? '');
 
     const dialog = useDialog<PromptDialogReturns>();
+
+    createEffect(() => {
+        input()?.focus();
+    });
 
     dialog.setButtons({
         positive: () => (
@@ -57,8 +62,18 @@ const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props
                 onChange={(event, value) => {
                     setValue(value);
                 }}
+                onKeyPress={e => {
+                    if (e.key === 'Enter') {
+                        dialog.close({
+                            response: 'positive',
+                            returns: {
+                                value: value()
+                            }
+                        });
+                    }
+                }}
                 label={props.label}
-                />
+                inputRef={setInput} />
         </Stack>
     );
 });
