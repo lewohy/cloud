@@ -4,7 +4,7 @@ import logger, { sendError } from '~/src/logger';
 import { isString } from '~/src/typguard';
 import { sleep } from '../test';
 import { getMeta } from '~/src/meta';
-import { createShareId } from '../share';
+import { createShareId, getShareIdByLocation } from '../share';
 
 export default function startAPIServer(app: core.Express) {
     // NOTE: storage api 서버
@@ -82,7 +82,7 @@ export default function startAPIServer(app: core.Express) {
         try {
             const location = getLocation(req);
 
-            const shareId = await createShareId(location);
+            const shareId = await getShareIdByLocation(location) ?? await createShareId(location);
 
             res.status(200).send({
                 shareId
