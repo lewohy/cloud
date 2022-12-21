@@ -16,9 +16,10 @@ import { ScrollView } from '~/public/components/ScrollView';
 import { createContext } from 'solid-js';
 import promptDialog from '~/public/dialogs/PromptDialog';
 import alertDialog from '~/public/dialogs/AlertDialog';
-import cr from '~/public/ts/request/storage/cr';
-import share from '~/public/ts/request/share/share';
+import storage from 'ts/request/storage';
+import share from 'ts/request/share';
 import copyDialog from '~/public/dialogs/CopyDialog';
+import { getPathString } from 'ts/location';
 
 interface FileListItemContext {
     getItem(): cloud.Item | null;
@@ -65,7 +66,7 @@ export const FileListItem = (props: FileListItemProps) => {
 
     const renameItem = async (name: string, newName: string) => {
         try {
-            const result = await cr.put(`/api/storage/${cr.getPathString(fileList.getLocation())}/${name}`, {
+            const result = await storage.put(`/api/storage/${getPathString(fileList.getLocation())}/${name}`, {
                 name: newName
             });
         } catch (error) {
@@ -76,7 +77,7 @@ export const FileListItem = (props: FileListItemProps) => {
 
     const deleteItem = async (name: string) => {
         try {
-            const result = await cr.delete(`/api/storage/${cr.getPathString(fileList.getLocation())}/${name}`);
+            const result = await storage.delete(`/api/storage/${getPathString(fileList.getLocation())}/${name}`);
         } catch (error) {
             // TODO: 요청 실패 처리하기
             console.error(error);
@@ -269,7 +270,7 @@ export const FileListItem = (props: FileListItemProps) => {
 
                                             if (name !== undefined) {
                                                 const location = fileList.getLocation();
-                                                const response = await share.post(cr.getPathString({
+                                                const response = await share.post(getPathString({
                                                     scope: location.scope,
                                                     path: [...location.path, name]
                                                 }), {});

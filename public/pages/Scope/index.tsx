@@ -108,6 +108,11 @@ export const Scope = (props: ScopeProps) => {
                                         autoComplete="off"
                                         value={scopeName()}
                                         onChange={(e, value) => setScopeName(value)}
+                                        onKeyPress={e => {
+                                            if (e.key === 'Enter') {
+                                                location.pathname = `/storage/${scopeName()}`;
+                                            }
+                                        }}
                                         fullWidth/>
                                 </Stack>
 

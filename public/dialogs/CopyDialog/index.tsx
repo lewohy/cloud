@@ -36,14 +36,6 @@ const copyDialog = createSmulog<CopyDialogReturns, CopyDialogProps>((props: Copy
                 }}>
                 OK
             </Button>
-        ),
-        negative: () => (
-            <Button
-                onClick={e => {
-                    dialog.close();
-                }}>
-                Cancel
-            </Button>
         )
     })
 

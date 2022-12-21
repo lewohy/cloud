@@ -10,7 +10,8 @@ import { FileList } from '~/public/components/FileList';
 import { grey, blue } from '@suid/material/colors';
 import { ScrollView } from '~/public/components/ScrollView';
 import { SmulogContainer } from '~/public/dialogs/dialog';
-import cr from '~/public/ts/request/storage/cr';
+import storage from 'ts/request/storage';
+import { getPathString } from 'ts/location';
 
 type StorageParams = Record<'scope' | 'path', string>;
 
@@ -46,7 +47,7 @@ export const Storage = (props: StorageProps) => {
     const navigate = useNavigate();
 
     createEffect(() => {
-        document.title = `${cr.getPathString(location())}`;
+        document.title = `${getPathString(location())}`;
     });
 
     return (
