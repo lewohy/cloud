@@ -7,7 +7,7 @@ import { createContext, createEffect, createMemo, createSignal, For, JSX, Match,
 import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
-import storage from 'ts/request/storage';
+import storage from '~/public/ts/request/storage';
 import { io, Socket } from 'socket.io-client';
 import { SxProps } from "@suid/system";
 import { Theme } from "@suid/system/createTheme";
@@ -15,7 +15,7 @@ import { isDirectoryEntry, isFileEntry } from '~/public/ts/typeguard';
 import { checkListDialog } from '~/public/dialogs/CheckListDialog';
 import alertDialog from '~/public/dialogs/AlertDialog';
 import { useTheme } from '@suid/material';
-import { getPathString } from 'ts/location';
+import { getPathString } from '~/public/ts/location';
 
 
 interface FileListContext {

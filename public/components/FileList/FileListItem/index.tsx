@@ -16,10 +16,10 @@ import { ScrollView } from '~/public/components/ScrollView';
 import { createContext } from 'solid-js';
 import promptDialog from '~/public/dialogs/PromptDialog';
 import alertDialog from '~/public/dialogs/AlertDialog';
-import storage from 'ts/request/storage';
-import share from 'ts/request/share';
+import storage from '~/public/ts/request/storage';
+import share from '~/public/ts/request/share';
 import copyDialog from '~/public/dialogs/CopyDialog';
-import { getPathString } from 'ts/location';
+import { getPathString } from '~/public/ts/location';
 
 interface FileListItemContext {
     getItem(): cloud.Item | null;

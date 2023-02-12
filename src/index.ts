@@ -38,7 +38,7 @@ async function createServer() {
     startWebSocketServer(server);
     
     server.listen(config.port, () => {
-        logger.info(`Server is listening on port ${config.port}`);
+        logger.info(`Server is listening on http://127.0.0.1:${config.port}`);
     });
 }
 

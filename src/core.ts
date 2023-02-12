@@ -112,7 +112,7 @@ export function getPathString(location: cloud.Location): string {
  * @param scope 사용할 scope 이름
  */
 export async function createScope(scope: string): Promise<void> {
-   await createNormalDirectory({
+    await createNormalDirectory({
         scope: '',
         path: []
     }, {
@@ -149,7 +149,7 @@ export async function createNormalDirectory(location: cloud.Location, entity: cl
             });
 
             fs.writeFileSync(path.resolve(absolutePath, entity.name, config.path.storage.meta.name), JSON.stringify({
-                // TODO: 기본 meta내용 생성기 만들어서 쓰기. 그리고 typeing과 동기화시키기
+                // TODO: 기본 meta내용 생성기 만들어서 쓰기. 그리고 typing과 동기화시키기
                 items: [],
                 backups: []
             } as cloud.Meta, null, 4));

@@ -33,7 +33,7 @@ export function getMeta(location: cloud.Location): cloud.Meta {
 export async function modifyMeta(location: cloud.Location, callback: (meta: cloud.Meta) => Promise<cloud.Meta>): Promise<cloud.Meta> {
     return new Promise(async (resolve, reject) => {
         const release = await mutex.acquire();
-        logger.info(`lock mutex for ${getPathString(location)} while modifying meta.json`);
+        //logger.info(`lock mutex for ${getPathString(location)} while modifying meta.json`);
         try {
             const meta = getMeta(location);
             const newMeta = await callback(meta);
@@ -50,7 +50,7 @@ export async function modifyMeta(location: cloud.Location, callback: (meta: clou
             reject(e);
         } finally {
             release();
-            logger.info(`unlock mutex for ${getPathString(location)} while modifying meta.json`);
+            //logger.info(`unlock mutex for ${getPathString(location)} while modifying meta.json`);
         }
     });
 }

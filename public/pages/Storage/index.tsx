@@ -10,8 +10,8 @@ import { FileList } from '~/public/components/FileList';
 import { grey, blue } from '@suid/material/colors';
 import { ScrollView } from '~/public/components/ScrollView';
 import { SmulogContainer } from '~/public/dialogs/dialog';
-import storage from 'ts/request/storage';
-import { getPathString } from 'ts/location';
+import storage from '~/public/ts/request/storage';
+import { getPathString } from '~/public/ts/location';
 
 type StorageParams = Record<'scope' | 'path', string>;
 
