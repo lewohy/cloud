@@ -1,6 +1,6 @@
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
-import { createSmulog, useDialog } from '~/public/dialogs/dialog';
+import { createSmulog, useDialog } from '~/public/smulog/smulog';
 import Button from '@suid/material/Button';
 
 interface AlertDialogReturns {

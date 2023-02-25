@@ -1,7 +1,7 @@
 import Stack from '@suid/material/Stack';
 import TextField from '@suid/material/TextField';
 import Typography from '@suid/material/Typography';
-import { createSmulog, useDialog } from '~/public/dialogs/dialog';
+import { createSmulog, useDialog } from '~/public/smulog/smulog';
 import { createSignal } from 'solid-js';
 import Button from '@suid/material/Button';
 import { IconButton } from '@suid/material';

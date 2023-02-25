@@ -35,7 +35,7 @@ export const ScrollView = (props: ScrollViewProps) => {
             ref={setView}
             sx={{
                 width: '100%',
-                height: '100%',
+                // height: '100%',
                 paddingLeft: showScrollbar() ? `${width() + padding() * 2}px` : '0px',
                 overflowY: 'scroll',
                 '&::-webkit-scrollbar': {

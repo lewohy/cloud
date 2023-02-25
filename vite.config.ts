@@ -2,9 +2,22 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import suidPlugin from "@suid/vite-plugin";
+import monacoEditorPlugin from 'vite-plugin-monaco-editor';
 
 export default defineConfig({
-    plugins: [solidPlugin(), suidPlugin()],
+    plugins: [
+        solidPlugin(),
+        suidPlugin(),
+        monacoEditorPlugin({
+            languageWorkers: [
+                'editorWorkerService',
+                'css',
+                'html',
+                'json',
+                'typescript'
+            ]
+        })
+    ],
     build: {
         target: 'esnext'
     },

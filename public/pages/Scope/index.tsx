@@ -12,7 +12,7 @@ import Typography from '@suid/material/Typography';
 import { createSignal } from 'solid-js';
 import { JSX } from 'solid-js';
 import { ScrollView } from '~/public/components/ScrollView';
-import { SmulogContainer } from '~/public/dialogs/dialog';
+import { SmulogContainer } from '~/public/smulog/smulog';
 
 export interface ScopeProps {
 

@@ -10,15 +10,15 @@ import { isFile, isFileEntry } from '~/public/ts/typeguard';
 import { RippleBase, RippleBaseProps } from '~/public/components/RippleBase';
 import { useFileList } from '..';
 import { FileListItemMenu } from './FileListItemMenu';
-import { useDialogContainer } from '~/public/dialogs/dialog';
-import { DeleteOutline, DriveFileRenameOutline, Folder, InsertDriveFileOutlined, Share, ShareOutlined } from '@suid/icons-material';
+import { useDialogContainer } from '~/public/smulog/smulog';
+import { CheckBox, DeleteOutline, DriveFileRenameOutline, Folder, InsertDriveFileOutlined, Share, ShareOutlined } from '@suid/icons-material';
 import { ScrollView } from '~/public/components/ScrollView';
 import { createContext } from 'solid-js';
-import promptDialog from '~/public/dialogs/PromptDialog';
-import alertDialog from '~/public/dialogs/AlertDialog';
+import promptDialog from '~/public/smulog/PromptDialog';
+import alertDialog from '~/public/smulog/AlertDialog';
 import storage from '~/public/ts/request/storage';
 import share from '~/public/ts/request/share';
-import copyDialog from '~/public/dialogs/CopyDialog';
+import copyDialog from '~/public/smulog/CopyDialog';
 import { getPathString } from '~/public/ts/location';
 
 interface FileListItemContext {
@@ -103,6 +103,7 @@ export const FileListItem = (props: FileListItemProps) => {
                     spacing="24px"
                     alignItems="center"
                     direction="row">
+
 
                     <Stack
                         sx={{

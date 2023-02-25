@@ -1,0 +1,29 @@
+{
+    "$schema": "https://json.schemastore.org/eslintrc.json",
+    "env": {
+        "es2021": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+        
+    ],
+    "overrides": [],
+    "parserOptions": {
+    },
+    "plugins": [
+        
+    ],
+    "rules": {
+        "indent": [
+            "error",
+            4
+        ],
+        "max-len": [
+            "off",
+            {
+                "code": 80,
+                "ignoreComments": true
+            }
+        ]
+    }
+}

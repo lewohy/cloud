@@ -10,7 +10,7 @@ import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import { createSignal, For } from 'solid-js';
 import { ScrollView } from '~/public/components/ScrollView';
-import { createSmulog, useDialog } from '~/public/dialogs/dialog';
+import { createSmulog, useDialog } from '~/public/smulog/smulog';
 import Box from '@suid/material/Box';
 
 export interface CheckListDialogReturns {

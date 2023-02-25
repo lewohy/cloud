@@ -9,12 +9,20 @@ import startUploadServer from './servers/upload';
 import logger from '~/src/logger';
 import http from 'http';
 import { init } from './core';
+import path from 'path';
 
 async function createServer() {
     const app = express();
     const server = http.createServer(app);
     const viteServer = await vite.createServer({
-        configFile: './vite.config.ts'
+        configFile: './vite.config.ts',
+        server: {
+            watch: {
+                ignored: [
+                    path.resolve(process.cwd(), config.path.storage.name),
+                ]
+            }
+        }
     });
 
     // TODO: 이거 수정

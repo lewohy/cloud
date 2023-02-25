@@ -1,10 +1,8 @@
-// TODO: 나중에 모듈로 분리하기
-
-import Box from '@suid/material/Box';
-import Fade from '@suid/material/Fade';
+import { Box } from '@suid/material';
+import Modal from '@suid/material/Modal';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
-import { createComponent, createContext, createEffect, createSignal, For, JSX, useContext } from 'solid-js';
+import { createComponent, createContext, createSignal, For, JSX, useContext } from 'solid-js';
 
 interface Response<ReturnType> {
     response: 'positive' | 'negative';
@@ -98,14 +96,19 @@ export function SmulogContainer(props: { children: JSX.Element }) {
 
                             return createComponent(() => {
                                 return (
-                                    <Fade
-                                        in={true}>
-                                        <Stack
+                                    <Modal
+                                        open={true}
+                                        onClose={(event, reason) => {
+                                            data.smulog.closeCall?.({
+                                                response: 'negative'
+                                            });    
+                                        }}>
+                                        <Box
                                             sx={{
-                                                position: 'fixed',
-                                                width: '100%',
-                                                height: '100%',
-                                                backgroundColor: 'rgba(0, 0, 0, 0.5)', // TODO: 테마에서 가져오기
+                                                position: 'absolute',
+                                                top: '50%',
+                                                left: '50%',
+                                                transform: 'translate(-50%, -50%)',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center'
@@ -128,7 +131,7 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                     sx={{
                                                         width: '540px',
                                                         height: 'auto',
-                                                        maxWidth: '100%',
+                                                        maxWidth: '100vw',
                                                         maxHeight: '80%',
                                                         bgcolor: 'background.default',
                                                         boxShadow: "0px 0px 32px rgba(0,0,0,0.2)",
@@ -152,8 +155,7 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                                     variant="h6"
                                                                     sx={{
                                                                         padding: '16px 0px'
-                                                                    }}
-                                                                >
+                                                                    }}>
                                                                     {data.option.title}
                                                                 </Typography>
 
@@ -188,8 +190,8 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                     </Stack>
                                                 </Stack>
                                             </SmulogContext.Provider>
-                                        </Stack>
-                                    </Fade>
+                                        </Box>
+                                    </Modal>
                                 )
 
                             }, {})
