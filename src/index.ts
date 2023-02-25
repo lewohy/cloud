@@ -27,7 +27,12 @@ async function createServer() {
 
     // TODO: 이거 수정
     app.use(async (req, res, next) => {
-        if (req.path.startsWith('/scope') || req.path.startsWith('/storage') || req.path.startsWith('/share') || req.path.startsWith('/api') || req.path.startsWith('/upload')) {
+        if (req.path === '/' ||
+            req.path.startsWith('/scope') ||
+            req.path.startsWith('/storage') ||
+            req.path.startsWith('/share') ||
+            req.path.startsWith('/api') ||
+            req.path.startsWith('/upload')) {
             next();
         } else {
             return viteServer.middlewares(req, res, next);

@@ -8,6 +8,10 @@ import { getLocationByShareId } from '../share';
 import { getScopeList } from '../scope';
 
 export default function startWebServer(app: core.Express) {
+    app.get('/', (req, res) => {
+        res.redirect('/scope');
+    });
+
     // NOTE: 웹 서버 또는 파일 서버
     app.get('/share/:shareId', (req, res) => {
         const shareId = req.params.shareId;
