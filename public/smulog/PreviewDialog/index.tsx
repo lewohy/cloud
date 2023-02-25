@@ -96,22 +96,22 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
                             maxHeight: '50vh',
 
                         }}>
-                        <ScrollView
-                            showScrollbar={true}>
-                            <Switch>
-                                <Match
-                                    when={text() === null} >
-                                    <CircularProgress />
-                                </Match>
-                                <Match
-                                    when={text() !== null}>
-                                    <CodeView
-                                        text={text() ?? ''}
-                                        language="typescript"
-                                        theme="vs-dark" />
-                                </Match>
-                            </Switch>
-                        </ScrollView>
+                        <Switch>
+                            <Match
+                                when={text() === null} >
+                                <CircularProgress />
+                            </Match>
+                            <Match
+                                when={text() !== null}>
+                                <CodeView
+                                    sx={{
+                                        width: '100%',
+                                    }}
+                                    text={text() ?? ''}
+                                    language="typescript"
+                                    theme="vs-dark" />
+                            </Match>
+                        </Switch>
                     </Box>
                 </Match>
             </Switch>
