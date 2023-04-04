@@ -2,7 +2,7 @@ import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import { createSmulog, useDialog } from '~/public/smulog/smulog';
 import Button from '@suid/material/Button';
-import { createEffect, createSignal, Match, Switch } from 'solid-js';
+import { createEffect, createMemo, createSignal, Match, Switch } from 'solid-js';
 import { Box, CircularProgress } from '@suid/material';
 import { editor } from 'monaco-editor';
 import { ScrollView } from '~/public/components/ScrollView';
@@ -21,6 +21,13 @@ interface PreviewDialogProps {
 
 const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((props: PreviewDialogProps) => {
     const [text, setText] = createSignal<string | null>(null);
+    const type = createMemo(() => {
+        if (props.mimeType === null) {
+            return null;
+        }
+
+        return props.mimeType.split('/')[1];
+    });
 
     const dialog = useDialog<PreviewDialogReturns>();
 
@@ -43,8 +50,14 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
                 Cancel
             </Button>
         )
-    })
+    });
     
+    
+    createEffect(() => {
+        
+        
+    });
+
     createEffect(async () => {
         setText((await axios.get(props.downloadUrl)).data);
     });
@@ -108,8 +121,7 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
                                         width: '100%',
                                     }}
                                     text={text() ?? ''}
-                                    language="typescript"
-                                    theme="vs-dark" />
+                                    language={type() ?? 'plain'} />
                             </Match>
                         </Switch>
                     </Box>

@@ -10,7 +10,7 @@ import { useFileListItem } from '..';
 import { ListItemIcon, ListItemText, Menu, MenuItem, MenuList } from '@suid/material';
 
 export interface MenuItem {
-    icon: JSX.Element;
+    icon: () => JSX.Element;
     text: string;
     onClick: () => void;
 }
@@ -62,7 +62,7 @@ export const FileListItemMenu = (props: FileListItemMenuProps) => {
                                 item.onClick();
                             }}>
                             <ListItemIcon>
-                                {item.icon}
+                                {item.icon()}
                             </ListItemIcon>
                             <ListItemText>
                                 {item.text}

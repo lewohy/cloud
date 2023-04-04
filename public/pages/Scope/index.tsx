@@ -76,7 +76,8 @@ export const Scope = (props: ScopeProps) => {
                                     backgroundColor: theme.palette.secondary.main,
                                 }}
                                 justifyContent="start"
-                                alignItems="start">
+                                alignItems="start"
+                                spacing={1}>
                                 <Stack
                                     direction="column"
                                     sx={{
@@ -112,8 +113,7 @@ export const Scope = (props: ScopeProps) => {
                                             if (e.key === 'Enter') {
                                                 location.pathname = `/storage/${scopeName()}`;
                                             }
-                                        }}
-                                        fullWidth/>
+                                        }} />
                                 </Stack>
 
                                 <Stack

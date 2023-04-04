@@ -221,7 +221,7 @@ export const FileListItem = (props: FileListItemProps) => {
                         <FileListItemMenu
                             menuItemList={[
                                 {
-                                    icon: <DriveFileRenameOutline />,
+                                    icon: () => <DriveFileRenameOutline />,
                                     text: 'Rename',
                                     onClick: async () => {
                                         const name = item()?.name;
@@ -244,7 +244,7 @@ export const FileListItem = (props: FileListItemProps) => {
                                     }
                                 },
                                 {
-                                    icon: <DeleteOutline />,
+                                    icon: () => <DeleteOutline />,
                                     text: 'Delete',
                                     onClick: async () => {
                                         const name = item()?.name;
@@ -264,7 +264,7 @@ export const FileListItem = (props: FileListItemProps) => {
                                 },
                                 ...(item()?.type === 'file' ? [
                                     {
-                                        icon: <ShareOutlined />,
+                                        icon: () => <ShareOutlined />,
                                         text: 'Share',
                                         onClick: async () => {
                                             const name = item()?.name;

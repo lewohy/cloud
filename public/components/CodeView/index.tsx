@@ -10,8 +10,8 @@ import { createEffect, createMemo, createSignal, JSX } from 'solid-js';
 export interface CodeViewProps {
     sx?: BoxProps;
     text: string;
-    theme: string;
-    language: 'css' | 'html' | 'json' | 'typescript' | 'plaintext';
+    language: string;
+    // 'css' | 'html' | 'json' | 'typescript' | 'plain';
 }
 
 export const CodeView = (props: CodeViewProps) => {
@@ -21,7 +21,11 @@ export const CodeView = (props: CodeViewProps) => {
     createEffect(() => {
         const el = pre();
         if (el !== null) {
-            el.innerHTML = props.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            // REVIEW: 안전한지 확인 필요
+            el.innerHTML = props.text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
             editor.colorizeElement(el, {
                 tabSize: 4,
             });
