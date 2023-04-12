@@ -104,8 +104,10 @@ export const Storage = (props: StorageProps) => {
                                 margin: '16px 0px',
                             }}>
                             <PathItem
-                                href={`/storage/${location().scope}`}
-                                text={location().scope} />
+                                text={location().scope}
+                                onClick={e => {
+                                    navigate(`/storage/${location().scope}`);
+                                }} />
                             <For each={location().path}>
                                 {(item: string, index: () => number) => (
                                     <PathItem

@@ -2,9 +2,9 @@ import { useTheme } from '@suid/material';
 import ButtonBase from '@suid/material/ButtonBase';
 import Link from '@suid/material/Link';
 import Typography from '@suid/material/Typography';
-import { RippleBase } from '~/public/components/RippleBase';
+import { RippleBase, RippleBaseProps } from '~/public/components/RippleBase';
 
-export interface PathItemProps {
+export interface PathItemProps extends RippleBaseProps {
     href: string;
     text: string;
 }
@@ -17,11 +17,11 @@ export const PathItem = (props: PathItemProps) => {
             sx={{
                 padding: '4px',
                 borderRadius: '4px'
-            }}>
+            }}
+            onClick={props.onClick}>
             <Link
                 underline="none"
-                color={theme.palette.text.primary}
-                href={props.href}>
+                color={theme.palette.text.primary} >
                 <Typography
                     sx={{
                         display: 'inline-block',
