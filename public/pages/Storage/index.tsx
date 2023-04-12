@@ -111,8 +111,10 @@ export const Storage = (props: StorageProps) => {
                             <For each={location().path}>
                                 {(item: string, index: () => number) => (
                                     <PathItem
-                                        href={`/storage/${location().scope}/${location().path.slice(0, index() + 1).join('/')}`}
-                                        text={item} />
+                                        text={item}
+                                        onClick={e => {
+                                            navigate(`/storage/${location().scope}/${location().path.slice(0, index() + 1).join('/')}`);
+                                        }} />
                                 )}
                             </For>
                         </Breadcrumbs>
