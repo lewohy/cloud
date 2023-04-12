@@ -5,7 +5,6 @@ import Typography from '@suid/material/Typography';
 import { RippleBase, RippleBaseProps } from '~/public/components/RippleBase';
 
 export interface PathItemProps extends RippleBaseProps {
-    href: string;
     text: string;
 }
 
