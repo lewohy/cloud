@@ -4,7 +4,8 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
-        "dev": "nodemon"
+        "dev": "nodemon",
+        "postinstall": "cd public && yarn install"
     },
     "dependencies": {
         "async-mutex": "^0.4.0",
