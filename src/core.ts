@@ -180,8 +180,8 @@ export async function createNormalDirectory(location: cloud.Location, entity: cl
             });
 
             logger.info(`Directory ${[location.scope, ...paths.slice(0, i + 1)].join('/')} created.`);
-        } catch (e) {
-            logger.error(`Directory already exists. ${[location.scope, ...paths.slice(0, i + 1)].join('/')}`);
+        } catch (e: any) {
+            logger.error(e.message);
         }
     }
 }
