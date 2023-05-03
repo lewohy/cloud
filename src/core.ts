@@ -132,12 +132,13 @@ export async function createNormalDirectory(location: cloud.Location, entity: cl
         return await modifyMeta(location, async (meta) => {
             const absolutePath = getAbsoluteContentsPath(location);
 
-            if (!fs.existsSync(absolutePath)) {
-                throw new Error(`No base directory found. ${getPathString(location)}`);
-            }
-
             if (fs.existsSync(path.resolve(absolutePath, entity.name))) {
                 throw new Error(`Already exists. ${[location.scope, ...location.path, entity.name].join('/')}`);
+            }
+
+            // TODO: init에서 생성하도록 변경
+            if (!fs.existsSync(absolutePath)) {
+                logger.warn(`Base directory does not exists. The base directory of '${getPathString(location)}' will be created.`);
             }
 
             fs.mkdirSync(path.resolve(absolutePath, entity.name, config.path.storage.contents.name), {

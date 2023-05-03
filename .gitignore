@@ -131,6 +131,6 @@ dist
 
 .vscode
 TODO
-/storage
+/storage*
 /preference
 .yarn
