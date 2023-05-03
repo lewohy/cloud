@@ -240,7 +240,7 @@ export async function createPendingFile(location: cloud.Location, entity: cloud.
             } as cloud.File);
         }
 
-        logger.info(`Pending file ${absoluteTempPath} created.`);
+        logger.info(`Pending file ${path.resolve(absoluteTempPath, entity.name)} created.`);
 
         return meta;
     });
