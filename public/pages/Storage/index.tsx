@@ -14,6 +14,11 @@ import { useDialogContainer as useSmulogContainer } from '~/public/smulog/smulog
 import { getPathString } from '~/public/ts/location';
 import storage from '~/public/ts/request/storage';
 
+mime.define({
+    'text/typescript': ['ts']
+}, true);
+
+
 type StorageParams = Record<'scope' | 'path', string>;
 
 export interface StorageProps {
