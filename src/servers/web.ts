@@ -56,7 +56,9 @@ export default function startWebServer(app: core.Express) {
             }).end(fs.readFileSync(path.resolve(process.cwd(), './public/storage.html'), 'utf-8'));
         } else if (item.type === 'file') {
             const absolutePath = getAbsoluteBasePath(location);
-            res.download(absolutePath);
+            res.download(absolutePath, item.name, {
+                dotfiles: 'allow'
+            });
         }
     });
 
