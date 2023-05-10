@@ -3,26 +3,29 @@ import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
 import axios from 'axios';
 import { Match, Switch, createEffect, createMemo, createSignal } from 'solid-js';
+import { getDownloadUrl } from '~/public/ts/location';
 import { CodeView } from '~/public/components/CodeView';
 import { createSmulog, useDialog } from '~/public/smulog/smulog';
+import mime from 'mime';
+
+mime.define({
+    'text/typescript': ['ts']
+}, true);
 
 interface PreviewDialogReturns {
    
 }
 
 interface PreviewDialogProps {
-    mimeType: string | null;
-    downloadUrl: string;
+    location: cloud.Location;
+    file: cloud.File;
 }
 
 const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((props: PreviewDialogProps) => {
+    const mimeType = createMemo(() => mime.getType(props.file.name));
     const [text, setText] = createSignal<string | null>(null);
     const type = createMemo(() => {
-        if (props.mimeType === null) {
-            return null;
-        }
-
-        return props.mimeType.split('/')[1];
+        return mimeType()?.split('/')[1] ?? null;
     });
 
     const dialog = useDialog<PreviewDialogReturns>();
@@ -55,7 +58,7 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
     });
 
     createEffect(async () => {
-        setText((await axios.get(props.downloadUrl)).data);
+        setText((await axios.get(getDownloadUrl(props.location, props.file))).data);
     });
 
     return (
@@ -64,7 +67,7 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
             spacing={1}>
             <Switch>
                 <Match
-                    when={props.mimeType?.startsWith('image')}>
+                    when={mimeType()?.startsWith('image')}>
                     <Box
                         sx={{
                             display: 'flex',
@@ -72,7 +75,7 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
                             alignItems: 'center',
                         }}>
                         <img
-                            src={props.downloadUrl}
+                            src={getDownloadUrl(props.location, props.file)}
                             style={{
                                 'max-width': '100%',
                                 'max-height': '50vh'
@@ -80,7 +83,7 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
                     </Box>
                 </Match>  
                 <Match
-                    when={props.mimeType?.startsWith('video')}>
+                    when={mimeType()?.startsWith('video')}>
                     <Box
                         sx={{
                             display: 'flex',
@@ -88,7 +91,7 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
                             alignItems: 'center',
                         }}>
                         <video
-                            src={props.downloadUrl}
+                            src={getDownloadUrl(props.location, props.file)}
                             controls
                             style={{
                                 'max-width': '100%',
@@ -97,7 +100,7 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
                     </Box>
                 </Match>
                 <Match
-                    when={props.mimeType?.startsWith('text')}>
+                    when={mimeType()?.startsWith('text')}>
                     <Box
                         sx={{
                             display: 'flex',

@@ -3,21 +3,16 @@ import Breadcrumbs from '@suid/material/Breadcrumbs';
 import Container from '@suid/material/Container';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
-import mime from 'mime';
 import { For, createEffect, createMemo } from 'solid-js';
+import { isDirectory } from '~/public/ts/typeguard';
 import { FileList } from '~/public/components/FileList';
 import { PathItem } from '~/public/components/PathItem';
 import { ScrollView } from '~/public/components/ScrollView';
 import previewDialog from '~/public/smulog/PreviewDialog';
 import promptDialog from '~/public/smulog/PromptDialog';
 import { useDialogContainer as useSmulogContainer } from '~/public/smulog/smulog';
-import { getPathString } from '~/public/ts/location';
+import { getDownloadUrl, getPathString } from '~/public/ts/location';
 import storage from '~/public/ts/request/storage';
-
-mime.define({
-    'text/typescript': ['ts']
-}, true);
-
 
 type StorageParams = Record<'scope' | 'path', string>;
 
@@ -134,17 +129,17 @@ export const Storage = (props: StorageProps) => {
                             navigate(`/storage/${location().scope}/${location().path.slice(0, -1).join('/')}`);
                         }}
                         onItemClick={async item => {
-                            if (item.type === 'directory') {
+                            if (isDirectory(item)) {
                                 navigate(`/storage/${location().scope}/${[...location().path, item.name].join('/')}`);
-                            } else {
-                                const downloadUrl = `/storage/${location().scope}/${location().path.concat(item.name).join('/')}`;
+                            } else if (item.type === 'file') {
+                                const downloadUrl = getDownloadUrl(location(), item);
                                 
                                 const responnse = await previewDialog.show(smulogContainer,{
                                     title: 'Preview',
                                     cancelOnTouchOutside: true,
                                 }, {
-                                    mimeType: mime.getType(item.name),
-                                    downloadUrl
+                                    location: location(),
+                                    file: item
                                 });
 
                                 if (responnse?.response === 'positive') {
