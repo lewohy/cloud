@@ -1,11 +1,9 @@
 import * as core from 'express-serve-static-core';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 import logger from '~/src/logger';
-import { createScope, getLocation } from '../core';
-import { getAbsoluteBasePath, getAbsoluteContentsPath, getItem, getMeta } from '../meta';
+import { getAbsoluteBasePath, getItem } from '../meta';
 import { getLocationByShareId } from '../share';
-import { getScopeList } from '../scope';
 
 export default function startWebServer(app: core.Express) {
     app.get('/', (req, res) => {
@@ -30,37 +28,44 @@ export default function startWebServer(app: core.Express) {
             res.download(absolutePath);
         }
     });
-
-    app.get(/\/scope/, (req, res) => {
+    
+    app.get(/(\/scope|\/storage\/.+)$/, (req, res) => {
         res.status(200).set({
             'Content-Type': 'text/html'
-        }).end(fs.readFileSync(path.resolve(process.cwd(), './public/scope.html'), 'utf-8'));
+        }).end(fs.readFileSync(path.resolve(process.cwd(), './public/index.html'), 'utf-8'));
     });
 
-    app.get(/\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
-        const location = getLocation(req);
+    // TODO: remove
+    // app.get(/\/scope/, (req, res) => {
+    //     res.status(200).set({
+    //         'Content-Type': 'text/html'
+    //     }).end(fs.readFileSync(path.resolve(process.cwd(), './public/scope.html'), 'utf-8'));
+    // });
 
-        const scopeList = getScopeList();
+    // app.get(/\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
+    //     const location = getLocation(req);
 
-        if (!scopeList.includes(location.scope)) {
-            await createScope(location.scope);
-        }
+    //     const scopeList = getScopeList();
 
-        const item = getItem(location);
+    //     if (!scopeList.includes(location.scope)) {
+    //         await createScope(location.scope);
+    //     }
 
-        if (item === undefined) {
-            res.status(404).send('Not Found');
-        } else if (item.type === 'directory') {
-            res.status(200).set({
-                'Content-Type': 'text/html'
-            }).end(fs.readFileSync(path.resolve(process.cwd(), './public/storage.html'), 'utf-8'));
-        } else if (item.type === 'file') {
-            const absolutePath = getAbsoluteBasePath(location);
-            res.download(absolutePath, item.name, {
-                dotfiles: 'allow'
-            });
-        }
-    });
+    //     const item = getItem(location);
+
+    //     if (item === undefined) {
+    //         res.status(404).send('Not Found');
+    //     } else if (item.type === 'directory') {
+    //         res.status(200).set({
+    //             'Content-Type': 'text/html'
+    //         }).end(fs.readFileSync(path.resolve(process.cwd(), './public/storage.html'), 'utf-8'));
+    //     } else if (item.type === 'file') {
+    //         const absolutePath = getAbsoluteBasePath(location);
+    //         res.download(absolutePath, item.name, {
+    //             dotfiles: 'allow'
+    //         });
+    //     }
+    // });
 
     logger.info('Web server ready.');
 }
