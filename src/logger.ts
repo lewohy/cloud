@@ -7,7 +7,29 @@ import dayjs from 'dayjs';
 
 const logFilePath = path.resolve(config.log.base, dayjs().format(config.log.debug));
 
-const logger = winston.createLogger({
+const logger = {
+    info: (message: string) => {
+        const stack = new Error().stack?.split('\n').slice(1).map((e) => e.trim());
+
+        winstonLogger.info(message, {
+            stack
+        });
+    },
+    error: (e: unknown) => {
+        const stack = new Error().stack?.split('\n').slice(1).map((e) => e.trim());
+
+        winstonLogger.error(e);
+    },
+    warn: (message: string) => {
+        const stack = new Error().stack?.split('\n').slice(1).map((e) => e.trim());
+
+        winstonLogger.warn(message, {
+            stack
+        });
+    }
+}
+
+const winstonLogger = winston.createLogger({
     level: 'info',
     transports: [
         new winston.transports.Console({
@@ -24,14 +46,14 @@ const logger = winston.createLogger({
             filename: logFilePath,
             format: winston.format.combine(
                 winston.format.printf(info => {
-                    return `[${info.timestamp}] [${info.level}]: ${info.message}` + (info.stack ? `\n${info.stack}` : '');
+                    return `[${info.timestamp}] [${info.level}]: ${info.message}` + (info.stack ? info.stack.map((e: string) => `\t${e}`).join('\n') : '');
                 })
             )
         }),
     ],
     format: winston.format.combine(
         winston.format.errors({
-            stack: true
+            stack: false
         }),
         winston.format.timestamp({
             format: 'YYYY-MM-DD HH:mm:ss',
