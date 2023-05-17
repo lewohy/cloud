@@ -4,7 +4,6 @@ import Container from '@suid/material/Container';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import { For, createEffect, createMemo } from 'solid-js';
-import { isDirectory } from '~/public/ts/typeguard';
 import { FileList } from '~/public/components/FileList';
 import { PathItem } from '~/public/components/PathItem';
 import { ScrollView } from '~/public/components/ScrollView';
@@ -13,6 +12,7 @@ import promptDialog from '~/public/smulog/PromptDialog';
 import { useDialogContainer as useSmulogContainer } from '~/public/smulog/smulog';
 import { getDownloadUrl, getPathString } from '~/public/ts/location';
 import storage from '~/public/ts/request/storage';
+import { isDirectory } from '~/public/ts/typeguard';
 
 type StorageParams = Record<'scope' | 'path', string>;
 
@@ -197,5 +197,4 @@ export const Storage = (props: StorageProps) => {
             </Container>
         </ScrollView>
     );
-
 };
