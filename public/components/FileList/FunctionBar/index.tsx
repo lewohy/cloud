@@ -32,7 +32,7 @@ export const FunctionBar = (props: FunctionBarProps) => {
                 <Stack
                     direction="row"
                     spacing={1}>
-                    <NoteAdd/>
+                    <CreateNewFolder/>
                 </Stack>
             </Button>
             <Button
@@ -42,7 +42,7 @@ export const FunctionBar = (props: FunctionBarProps) => {
                 <Stack
                     direction="row"
                     spacing={1}>
-                    <CreateNewFolder/> 
+                    <NoteAdd/>
                 </Stack>
             </Button>
         </Stack>
