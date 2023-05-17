@@ -13,11 +13,13 @@ export interface ScopeProps {
 export const Scope = (props: ScopeProps) => {
     const navigate = useNavigate();
     const [scopeName, setScopeName] = createSignal('');
+    
     const onUseClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = async e => {
         if (scopeName().length === 0) {
             return;
         }
-        location.pathname = `/storage/${scopeName()}`;
+        
+        navigate(`/storage/${scopeName()}`);
     };
 
     return (

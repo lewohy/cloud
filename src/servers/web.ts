@@ -29,7 +29,7 @@ export default function startWebServer(app: core.Express) {
         }
     });
     
-    app.get(/(\/scope|\/storage\/.+)$/, (req, res) => {
+    app.get(/(\/scope|\/storage\/.+)/, (req, res) => {
         res.status(200).set({
             'Content-Type': 'text/html'
         }).end(fs.readFileSync(path.resolve(process.cwd(), './public/index.html'), 'utf-8'));

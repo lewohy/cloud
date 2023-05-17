@@ -6,8 +6,8 @@ export const RootRouter = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/scope/*" element={<Scope />} />
-                <Route path="/storage/*" element={<StorageRouter />} />
+                <Route path="/scope" element={<Scope />} />
+                <Route path="/storage/*a" element={<StorageRouter />} />
             </Routes>
         </Router>
     );
