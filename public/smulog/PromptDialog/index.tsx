@@ -1,10 +1,10 @@
+import { useTheme } from '@suid/material';
+import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
 import TextField from '@suid/material/TextField';
 import Typography from '@suid/material/Typography';
-import { createSmulog, useDialog } from '~/public/smulog/smulog';
 import { createEffect, createSignal } from 'solid-js';
-import Button from '@suid/material/Button';
-import { useTheme } from '@suid/material';
+import { createSmulog, useDialog } from '~/public/smulog/smulog';
 
 interface PromptDialogReturns {
     value: string;

@@ -2,11 +2,11 @@ import { Box, CircularProgress, useTheme } from '@suid/material';
 import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
 import axios from 'axios';
+import mime from 'mime';
 import { Match, Switch, createEffect, createMemo, createSignal } from 'solid-js';
-import { getDownloadUrl } from '~/public/ts/location';
 import { CodeView } from '~/public/components/CodeView';
 import { createSmulog, useDialog } from '~/public/smulog/smulog';
-import mime from 'mime';
+import { getDownloadUrl } from '~/public/ts/location';
 
 mime.define({
     'text/typescript': ['ts']

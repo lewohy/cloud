@@ -1,5 +1,5 @@
-import { Checkbox, CssBaseline, ThemeProvider, createTheme, useMediaQuery } from '@suid/material';
-import { createEffect, createMemo, createSignal } from 'solid-js';
+import { ThemeProvider, createTheme, useMediaQuery } from '@suid/material';
+import { createEffect, createMemo } from 'solid-js';
 import { render } from 'solid-js/web';
 import { RootRouter } from '~/public/routers/RootRouter';
 import '~/public/scss/base.scss';

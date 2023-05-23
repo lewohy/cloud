@@ -1,8 +1,8 @@
+import { CreateNewFolder, NoteAdd } from '@suid/icons-material';
+import Upload from "@suid/icons-material/Upload";
+import { useTheme } from '@suid/material';
 import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
-import Upload from "@suid/icons-material/Upload"
-import { CreateNewFolder, CreateNewFolderOutlined, NoteAdd, NoteAddOutlined } from '@suid/icons-material';
-import { useTheme } from '@suid/material';
 
 export interface FunctionBarProps {
     onUploadClick: () => void;

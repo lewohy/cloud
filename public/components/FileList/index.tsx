@@ -1,21 +1,18 @@
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
-import { useDialogContainer } from '~/public/smulog/smulog';
-import promptDialog from '~/public/smulog/PromptDialog';
+import { SxProps } from "@suid/system";
+import { Theme } from "@suid/system/createTheme";
 import random from 'random';
-import { createContext, createEffect, createMemo, createSignal, For, JSX, Match, Show, Switch, useContext } from 'solid-js';
+import { io, Socket } from 'socket.io-client';
+import { createContext, createEffect, createMemo, createSignal, For, Match, Show, Switch, useContext } from 'solid-js';
+import { checkListDialog } from '~/public/smulog/CheckListDialog';
+import { useDialogContainer } from '~/public/smulog/smulog';
+import { getPathString } from '~/public/ts/location';
+import storage from '~/public/ts/request/storage';
+import { isDirectoryEntry, isFileEntry } from '~/public/ts/typeguard';
 import { FileListItem } from './FileListItem';
 import { FunctionBar } from './FunctionBar';
 import { UpItem } from './UpItem';
-import storage from '~/public/ts/request/storage';
-import { io, Socket } from 'socket.io-client';
-import { SxProps } from "@suid/system";
-import { Theme } from "@suid/system/createTheme";
-import { isDirectoryEntry, isFileEntry } from '~/public/ts/typeguard';
-import { checkListDialog } from '~/public/smulog/CheckListDialog';
-import alertDialog from '~/public/smulog/AlertDialog';
-import { useTheme } from '@suid/material';
-import { getPathString } from '~/public/ts/location';
 
 
 interface FileListContext {

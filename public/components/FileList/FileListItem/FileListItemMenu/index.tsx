@@ -1,13 +1,8 @@
-import { ContentCopy, ContentCut, DeleteOutline, DeleteOutlined, DriveFileRenameOutline, MoreVert } from '@suid/icons-material';
-import Fade from '@suid/material/Fade';
+import { MoreVert } from '@suid/icons-material';
+import { ListItemIcon, ListItemText, Menu, MenuItem } from '@suid/material';
 import IconButton from '@suid/material/IconButton';
-import Popover from '@suid/material/Popover';
 import Stack from '@suid/material/Stack';
-import Typography from '@suid/material/Typography';
-import { RippleBase } from '~/public/components/RippleBase';
-import { createEffect, createMemo, createSignal, For, JSX } from 'solid-js';
-import { useFileListItem } from '..';
-import { ListItemIcon, ListItemText, Menu, MenuItem, MenuList } from '@suid/material';
+import { For, JSX, createMemo, createSignal } from 'solid-js';
 
 export interface MenuItem {
     icon: () => JSX.Element;

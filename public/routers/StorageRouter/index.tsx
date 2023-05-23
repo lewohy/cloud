@@ -1,4 +1,4 @@
-import { Route, Router, Routes } from '@solidjs/router';
+import { Route, Routes } from '@solidjs/router';
 import { Storage } from '~/public/pages/Storage';
 
 export const StorageRouter = () => {

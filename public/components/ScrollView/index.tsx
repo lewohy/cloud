@@ -1,7 +1,6 @@
 import { useTheme } from '@suid/material';
-import Box from '@suid/material/Box';
 import Stack from '@suid/material/Stack';
-import { createEffect, createMemo, createSignal, JSX } from 'solid-js';
+import { createMemo, createSignal, JSX } from 'solid-js';
 
 export interface ScrollViewProps {
     children: JSX.Element;

@@ -1,10 +1,9 @@
-import logger from '~/src/logger';
 import http from 'http';
-import { Server, Socket } from 'socket.io';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { isSocketQuery } from '~/src/typguard';
-import { observeMeta } from '~/src/meta';
+import { Server } from 'socket.io';
 import { getPathString } from '~/src/core';
+import logger from '~/src/logger';
+import { observeMeta } from '~/src/meta';
+import { isSocketQuery } from '~/src/typguard';
 
 export default function startWebSocketServer(server: http.Server) {
     const io = new Server(server, {

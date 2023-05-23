@@ -1,15 +1,15 @@
-import config from '~/config.json';
-import * as vite from 'vite';
 import express from 'express';
-import nocache from 'nocache';
-import startWebServer from './servers/web';
-import startAPIServer from './servers/api';
-import startWebSocketServer from './servers/ws';
-import startUploadServer from './servers/upload';
-import logger from '~/src/logger';
 import http from 'http';
-import { init } from './core';
+import nocache from 'nocache';
 import path from 'path';
+import * as vite from 'vite';
+import config from '~/config.json';
+import logger from '~/src/logger';
+import { init } from './core';
+import startAPIServer from './servers/api';
+import startUploadServer from './servers/upload';
+import startWebServer from './servers/web';
+import startWebSocketServer from './servers/ws';
 
 async function createServer() {
     const app = express();

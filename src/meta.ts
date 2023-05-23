@@ -1,6 +1,6 @@
+import { Mutex } from 'async-mutex';
 import fs from 'fs';
 import path from 'path';
-import { Mutex } from 'async-mutex';
 import config from '~/config.json';
 import { getBaseLocation, getPathString } from './core';
 import logger from './logger';

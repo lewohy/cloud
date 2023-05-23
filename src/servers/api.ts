@@ -1,9 +1,8 @@
 import * as core from 'express-serve-static-core';
-import { getLocation, createNormalDirectory, createPendingFile, deleteItem, renameItem, createNormalFile, getBaseLocation } from '~/src/core';
+import { createNormalDirectory, createNormalFile, createPendingFile, deleteItem, getBaseLocation, getLocation, renameItem } from '~/src/core';
 import logger, { sendError } from '~/src/logger';
-import { isString } from '~/src/typguard';
-import { sleep } from '../test';
 import { getMeta } from '~/src/meta';
+import { isString } from '~/src/typguard';
 import { createShareId, getShareIdByLocation } from '../share';
 
 export default function startAPIServer(app: core.Express) {

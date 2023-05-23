@@ -1,11 +1,11 @@
 
-import { Switch, Typography, useTheme } from '@suid/material';
+import { Switch, Typography } from '@suid/material';
 import Box from '@suid/material/Box';
 import BoxProps from '@suid/material/Box/BoxProps';
 import Stack from '@suid/material/Stack';
-import { ScrollView } from '~/public/components/ScrollView';
 import { editor } from 'monaco-editor';
-import { createEffect, createMemo, createSignal, JSX } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
+import { ScrollView } from '~/public/components/ScrollView';
 
 export interface CodeViewProps {
     sx?: BoxProps;

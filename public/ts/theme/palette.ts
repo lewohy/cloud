@@ -1,5 +1,5 @@
 import { Breakpoint } from '@suid/material';
-import { blue, grey } from '@suid/material/colors';
+import { grey } from '@suid/material/colors';
 import { ThemeInput } from '@suid/material/styles/createTheme';
 
 export const palette = {

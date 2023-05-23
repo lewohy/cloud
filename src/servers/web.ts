@@ -4,7 +4,6 @@ import path from 'path';
 import logger from '~/src/logger';
 import { getAbsoluteBasePath, getItem } from '../meta';
 import { getLocationByShareId } from '../share';
-import { assert } from 'console';
 
 export default function startWebServer(app: core.Express) {
     app.get('/', (req, res) => {

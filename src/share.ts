@@ -1,10 +1,10 @@
 import { Mutex } from 'async-mutex';
-import path from 'path';
-import { getPathString } from './core';
-import logger from './logger';
-import config from '~/config.json';
 import fs from 'fs';
 import { nanoid } from 'nanoid';
+import path from 'path';
+import config from '~/config.json';
+import { getPathString } from './core';
+import logger from './logger';
 
 const mutex = new Mutex();
 const absoluteSharePath = path.resolve(process.cwd(), config.path.preference.name, config.path.preference.share.name);

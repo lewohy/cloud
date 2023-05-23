@@ -2,7 +2,7 @@ import { Box, useTheme } from '@suid/material';
 import Modal from '@suid/material/Modal';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
-import { createComponent, createContext, createSignal, For, JSX, useContext } from 'solid-js';
+import { For, JSX, createComponent, createContext, createSignal, useContext } from 'solid-js';
 
 interface Response<ReturnType> {
     response: 'positive' | 'negative';

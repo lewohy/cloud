@@ -1,10 +1,10 @@
 import { useNavigate } from '@solidjs/router';
-import { useMediaQuery, useTheme } from '@suid/material';
+import { useTheme } from '@suid/material';
 import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
 import TextField from '@suid/material/TextField';
 import Typography from '@suid/material/Typography';
-import { JSX, createEffect, createMemo, createSignal } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 import { ScrollView } from '~/public/components/ScrollView';
 
 export interface ScopeProps {
