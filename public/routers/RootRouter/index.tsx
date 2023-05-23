@@ -3,11 +3,12 @@ import { Scope } from '~/public/pages/Scope';
 import { StorageRouter } from '~/public/routers/StorageRouter';
 
 export const RootRouter = () => {
+    // TODO: pat
     return (
         <Router>
             <Routes>
                 <Route path="/scope" element={<Scope />} />
-                <Route path="/storage/*a" element={<StorageRouter />} />
+                <Route path="/storage/*" element={<StorageRouter />} />
             </Routes>
         </Router>
     );
