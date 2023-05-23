@@ -3,7 +3,6 @@ import { Scope } from '~/public/pages/Scope';
 import { StorageRouter } from '~/public/routers/StorageRouter';
 
 export const RootRouter = () => {
-    // TODO: pat
     return (
         <Router>
             <Routes>

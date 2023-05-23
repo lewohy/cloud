@@ -1,4 +1,5 @@
 import { Folder } from '@suid/icons-material';
+import { useTheme } from '@suid/material';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
 import { JSX } from 'solid-js';
@@ -9,6 +10,7 @@ export interface UpItemProps {
 }
 
 export const UpItem = (props: UpItemProps) => {
+    const theme = useTheme();
 
     return (
         <RippleBase
@@ -30,7 +32,8 @@ export const UpItem = (props: UpItemProps) => {
 
                 <Folder
                     sx={{
-                        fontSize: '48px'
+                        fontSize: '48px',
+                        color: theme.palette.text.primary
                     }} />
 
                 <Stack
@@ -39,7 +42,8 @@ export const UpItem = (props: UpItemProps) => {
                     direction="column">
                     <Typography
                         sx={{
-                            display: 'flex'
+                            display: 'flex',
+                            color: theme.palette.text.primary
                         }}
                         variant="h6">
                         ..
@@ -47,7 +51,8 @@ export const UpItem = (props: UpItemProps) => {
 
                     <Typography
                         sx={{
-                            display: 'flex'
+                            display: 'flex',
+                            color: theme.palette.text.secondary,
                         }}
                         variant="subtitle2">
                         To up directory

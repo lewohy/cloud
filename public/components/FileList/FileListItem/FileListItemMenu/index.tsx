@@ -71,6 +71,6 @@ export const FileListItemMenu = (props: FileListItemMenuProps) => {
                     )}
                 </For>
             </Menu>
-        </Stack >
+        </Stack>
     );
 };

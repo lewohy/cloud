@@ -4,6 +4,7 @@ import Typography from '@suid/material/Typography';
 import { createSmulog, useDialog } from '~/public/smulog/smulog';
 import { createEffect, createSignal } from 'solid-js';
 import Button from '@suid/material/Button';
+import { useTheme } from '@suid/material';
 
 interface PromptDialogReturns {
     value: string;
@@ -16,6 +17,7 @@ interface PromptDialogProps {
 }
 
 const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props: PromptDialogProps) => {
+    const theme = useTheme();
     const [input, setInput] = createSignal<HTMLInputElement>(null!);
     const [value, setValue] = createSignal(props.default ?? '');
 
@@ -28,6 +30,9 @@ const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props
     dialog.setButtons({
         positive: () => (
             <Button
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 onClick={e => {
                     dialog.close({
                         response: 'positive',
@@ -41,6 +46,9 @@ const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props
         ),
         negative: () => (
             <Button
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 onClick={e => {
                     dialog.close();
                 }}>
@@ -54,6 +62,9 @@ const promptDialog = createSmulog<PromptDialogReturns, PromptDialogProps>((props
             direction="column"
             spacing={1}>
             <Typography
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 variant='body1'>
                 {props.message}
             </Typography>

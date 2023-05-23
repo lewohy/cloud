@@ -20,6 +20,7 @@ import storage from '~/public/ts/request/storage';
 import share from '~/public/ts/request/share';
 import copyDialog from '~/public/smulog/CopyDialog';
 import { getPathString } from '~/public/ts/location';
+import { useTheme } from '@suid/material';
 
 interface FileListItemContext {
     getItem(): cloud.Item | null;
@@ -43,6 +44,7 @@ export interface FileListItemProps {
 }
 
 export const FileListItem = (props: FileListItemProps) => {
+    const theme = useTheme();
     const smulogContainer = useDialogContainer();
 
     const fileList = useFileList();
@@ -124,7 +126,8 @@ export const FileListItem = (props: FileListItemProps) => {
                                 when={item()?.type === 'directory'}>
                                 <Folder
                                     sx={{
-                                        fontSize: '48px'
+                                        fontSize: '48px',
+                                        color: theme.palette.text.primary
                                     }} />
                             </Match>
 
@@ -132,7 +135,8 @@ export const FileListItem = (props: FileListItemProps) => {
                                 when={item()?.type === 'file'}>
                                 <InsertDriveFileOutlined
                                     sx={{
-                                        fontSize: '48px'
+                                        fontSize: '48px',
+                                        color: theme.palette.text.primary
                                     }} />
                             </Match>
                         </Switch>
@@ -153,6 +157,7 @@ export const FileListItem = (props: FileListItemProps) => {
                                 sx={{
                                     display: 'flex',
                                     whiteSpace: 'nowrap',
+                                    color: theme.palette.text.primary
                                 }}
                                 variant="h6">
                                 <Switch
@@ -178,6 +183,7 @@ export const FileListItem = (props: FileListItemProps) => {
                                 sx={{
                                     display: 'flex',
                                     whiteSpace: 'nowrap',
+                                    color: theme.palette.text.secondary
                                 }}
                                 variant="subtitle2">
                                 <Switch
@@ -221,7 +227,10 @@ export const FileListItem = (props: FileListItemProps) => {
                         <FileListItemMenu
                             menuItemList={[
                                 {
-                                    icon: () => <DriveFileRenameOutline />,
+                                    icon: () => <DriveFileRenameOutline
+                                        sx={{
+                                            color: theme.palette.text.secondary
+                                        }} />,
                                     text: 'Rename',
                                     onClick: async () => {
                                         const name = item()?.name;
@@ -244,7 +253,10 @@ export const FileListItem = (props: FileListItemProps) => {
                                     }
                                 },
                                 {
-                                    icon: () => <DeleteOutline />,
+                                    icon: () => <DeleteOutline
+                                        sx={{
+                                            color: theme.palette.text.secondary
+                                        }} />,
                                     text: 'Delete',
                                     onClick: async () => {
                                         const name = item()?.name;

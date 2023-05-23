@@ -29,7 +29,13 @@ export default function startWebSocketServer(server: http.Server) {
 
     observeMeta(modification => {
         const targetRoom = getPathString(modification.location);
-        // logger.info(`Sending modification to room ${targetRoom}.`);
+        logger.info(`Sending modification to room ${targetRoom}.`);
+        // get all socket in room
+        const sockets = io.sockets.adapter.rooms.get(targetRoom);
+        sockets?.forEach(socketId => {
+            logger.info(`Sending modification to ${socketId}.`);
+        });
+        logger.info(`Sending modification to `);
         io.to(targetRoom).emit('refresh');
     }); 
 

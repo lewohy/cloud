@@ -9,12 +9,12 @@ export const palette = {
                 mode: dark ? 'dark' : 'light',
                 ...(dark ? {
                     primary: {
-                        main: blue['400']
+                        main: grey['800']
                     },
+                    secondary: {
+                        main: '#1a1a1a'
+                    }
                 } : {
-                    background: {
-                        default: '#ffffff',
-                    },
                     primary: {
                         main: grey['500']
                     },

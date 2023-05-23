@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from '@solidjs/router';
+import { useTheme } from '@suid/material';
 import Breadcrumbs from '@suid/material/Breadcrumbs';
 import Container from '@suid/material/Container';
 import Stack from '@suid/material/Stack';
@@ -21,6 +22,7 @@ export interface StorageProps {
 }
 
 export const Storage = (props: StorageProps) => {
+    const theme = useTheme();
     const smulogContainer = useSmulogContainer();
 
     const params = useParams<StorageParams>();
@@ -78,123 +80,137 @@ export const Storage = (props: StorageProps) => {
     });
 
     return (
-        <ScrollView>
-            <Container
-                maxWidth="md"
-                sx={{
-                    width: '100%',
-                    height: 'auto',
-                    minHeight: '100%',
-                    display: 'flex',
-                }}>
-                <Stack
+        <Stack
+            sx={{
+                width: '100%',
+                height: '100%',
+                backgroundColor: theme.palette.background.paper
+            }}>
+            <ScrollView>
+                <Container
+                    maxWidth="md"
                     sx={{
                         width: '100%',
                         height: 'auto',
                         minHeight: '100%',
-                        marginLeft: '4px',
-                        marginRight: '4px',
+                        display: 'flex',
                     }}>
-
-                    <Stack>
-                        <Typography variant='h3'>{location().scope}</Typography>
-
-                        <Breadcrumbs
-                            sx={{
-                                margin: '16px 0px',
-                            }}>
-                            <PathItem
-                                text={location().scope}
-                                onClick={e => {
-                                    navigate(`/storage/${location().scope}`);
-                                }} />
-                            <For each={location().path}>
-                                {(item: string, index: () => number) => (
-                                    <PathItem
-                                        text={item}
-                                        onClick={e => {
-                                            navigate(`/storage/${location().scope}/${location().path.slice(0, index() + 1).join('/')}`);
-                                        }} />
-                                )}
-                            </For>
-                        </Breadcrumbs>
-                    </Stack>
-                    <FileList
+                    <Stack
                         sx={{
-                            height: '100%',
-                            flexGrow: 1
-                        }}
-                        location={location()}
-                        onUpClick={() => {
-                            navigate(`/storage/${location().scope}/${location().path.slice(0, -1).join('/')}`);
-                        }}
-                        onItemClick={async item => {
-                            if (isDirectory(item)) {
-                                navigate(`/storage/${location().scope}/${[...location().path, item.name].join('/')}`);
-                            } else if (item.type === 'file') {
-                                const downloadUrl = getDownloadUrl(location(), item);
+                            width: '100%',
+                            height: 'auto',
+                            minHeight: '100%',
+                            marginLeft: '4px',
+                            marginRight: '4px',
+                        }}>
+
+                        <Stack>
+                            <Typography
+                                sx={{
+                                    color: theme.palette.text.primary,
+
+                                }}
+                                variant='h3'>
+                                {location().scope}
+                            </Typography>
+
+                            <Breadcrumbs
+                                sx={{
+                                    margin: '16px 0px',
+                                }}>
+                                <PathItem
+                                    text={location().scope}
+                                    onClick={e => {
+                                        navigate(`/storage/${location().scope}`);
+                                    }} />
+                                <For each={location().path}>
+                                    {(item: string, index: () => number) => (
+                                        <PathItem
+                                            text={item}
+                                            onClick={e => {
+                                                navigate(`/storage/${location().scope}/${location().path.slice(0, index() + 1).join('/')}`);
+                                            }} />
+                                    )}
+                                </For>
+                            </Breadcrumbs>
+                        </Stack>
+                        <FileList
+                            sx={{
+                                height: '100%',
+                                flexGrow: 1
+                            }}
+                            location={location()}
+                            onUpClick={() => {
+                                navigate(`/storage/${location().scope}/${location().path.slice(0, -1).join('/')}`);
+                            }}
+                            onItemClick={async item => {
+                                if (isDirectory(item)) {
+                                    navigate(`/storage/${location().scope}/${[...location().path, item.name].join('/')}`);
+                                } else if (item.type === 'file') {
+                                    const downloadUrl = getDownloadUrl(location(), item);
                                 
-                                const responnse = await previewDialog.show(smulogContainer,{
-                                    title: 'Preview',
-                                    cancelOnTouchOutside: true,
-                                }, {
-                                    location: location(),
-                                    file: item
-                                });
+                                    const responnse = await previewDialog.show(smulogContainer,{
+                                        title: 'Preview',
+                                        cancelOnTouchOutside: true,
+                                    }, {
+                                        location: location(),
+                                        file: item
+                                    });
 
-                                if (responnse?.response === 'positive') {
-                                    window.open(downloadUrl, '_blank');
-                                }
-                            }
-                        }}
-                        onUploadClick={async () => {
-                            const fileList = await getSelectedFileListByUser();
-                        
-                            // TODO: 중복 파일 처리하기
-                            fileList.forEach(async file => {
-                                await storage.post(`/api/storage/${getPathString(location())}`, {
-                                    entity: {
-                                        type: 'file',
-                                        name: file.name,
-                                        state: 'pending'
+                                    if (responnse?.response === 'positive') {
+                                        window.open(downloadUrl, '_blank');
                                     }
+                                }
+                            }}
+                            onUploadClick={async () => {
+                                const fileList = await getSelectedFileListByUser();
+                        
+                                // TODO: 중복 파일 처리하기
+                                fileList.forEach(async file => {
+                                    await storage.post(`/api/storage/${getPathString(location())}`, {
+                                        entity: {
+                                            type: 'file',
+                                            name: file.name,
+                                            state: 'pending'
+                                        }
+                                    });
+
+                                    await storage.upload(`/upload/storage/${getPathString(location())}`, file);
+                                });
+                            }}
+                            onCreateFolderClick={async () => {
+                            
+                                const result = await promptDialog.show(smulogContainer, {
+                                    title: 'Create Folder'
+                                }, {
+                                    message: '폴더 이름을 입력하세요.',
+                                    label: 'New Folder'
                                 });
 
-                                await storage.upload(`/upload/storage/${getPathString(location())}`, file);
-                            });
-                        }}
-                        onCreateFolderClick={async () => {
-                            
-                            const result = await promptDialog.show(smulogContainer, {
-                                title: 'Create Folder'
-                            }, {
-                                message: '폴더 이름을 입력하세요.',
-                                label: 'New Folder'
-                            });
-
-                            if (result.response === 'positive') {
-                                if (result.returns !== undefined) {
-                                    await createFolder(result.returns.value);
+                                if (result.response === 'positive') {
+                                    if (result.returns !== undefined) {
+                                        await createFolder(result.returns.value);
+                                    }
                                 }
-                            }
-                        }}
-                        onCreateFileClick={async () => {
+                            }}
+                            onCreateFileClick={async () => {
                             
-                            const result = await promptDialog.show(smulogContainer, {
-                                title: 'Create File'
-                            }, {
-                                message: '파일 이름을 입력하세요.',
-                                label: 'New File'
-                            });
+                                const result = await promptDialog.show(smulogContainer, {
+                                    title: 'Create File'
+                                }, {
+                                    message: '파일 이름을 입력하세요.',
+                                    label: 'New File'
+                                });
 
-                            if (result.response === 'positive') {
-                                if (result.returns !== undefined) {
-                                    await createFile(result.returns.value);
+                                if (result.response === 'positive') {
+                                    if (result.returns !== undefined) {
+                                        await createFile(result.returns.value);
+                                    }
                                 }
-                            }
-                        }} />
-                </Stack>
-            </Container>
-        </ScrollView>
+                            }} />
+                    </Stack>
+                </Container>
+            </ScrollView>
+        </Stack>
     );
 };

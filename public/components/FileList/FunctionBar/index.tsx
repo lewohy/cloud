@@ -2,6 +2,7 @@ import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
 import Upload from "@suid/icons-material/Upload"
 import { CreateNewFolder, CreateNewFolderOutlined, NoteAdd, NoteAddOutlined } from '@suid/icons-material';
+import { useTheme } from '@suid/material';
 
 export interface FunctionBarProps {
     onUploadClick: () => void;
@@ -11,6 +12,8 @@ export interface FunctionBarProps {
 }
 
 export const FunctionBar = (props: FunctionBarProps) => {
+    const theme = useTheme();
+
     return (
         <Stack
             sx={{
@@ -23,7 +26,10 @@ export const FunctionBar = (props: FunctionBarProps) => {
                 onClick={e => {
                     props.onUploadClick?.();
                 }}>
-                <Upload/>
+                <Upload
+                    sx={{
+                        color: theme.palette.text.secondary
+                    }}/>
             </Button>
             <Button
                 onClick={e => {
@@ -32,7 +38,10 @@ export const FunctionBar = (props: FunctionBarProps) => {
                 <Stack
                     direction="row"
                     spacing={1}>
-                    <CreateNewFolder/>
+                    <CreateNewFolder
+                        sx={{
+                            color: theme.palette.text.secondary
+                        }}/>
                 </Stack>
             </Button>
             <Button
@@ -42,7 +51,10 @@ export const FunctionBar = (props: FunctionBarProps) => {
                 <Stack
                     direction="row"
                     spacing={1}>
-                    <NoteAdd/>
+                    <NoteAdd
+                        sx={{
+                            color: theme.palette.text.secondary
+                        }}/>
                 </Stack>
             </Button>
         </Stack>

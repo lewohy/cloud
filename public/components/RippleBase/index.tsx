@@ -10,10 +10,10 @@ export const RippleBase = (props: RippleBaseProps) => {
 
     props.sx = {
         ...props.sx,
-        background: theme.palette.background.default,
+        backgroundColor: theme.palette.background.paper,
         transition: 'background 0.2s ease-in-out',
         '&:hover': {
-            background: theme.palette.action.hover,
+            backgroundColor: theme.palette.action.hover,
             // NOTE: sx에 &:hover가 없다고 뜸
             /** @ts-ignore */
             ...props.sx?.['&:hover']

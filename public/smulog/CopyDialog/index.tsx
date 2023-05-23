@@ -1,11 +1,11 @@
+import { ContentCopyOutlined } from '@suid/icons-material';
+import { useTheme } from '@suid/material';
+import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
 import TextField from '@suid/material/TextField';
 import Typography from '@suid/material/Typography';
-import { createSmulog, useDialog } from '~/public/smulog/smulog';
 import { createSignal } from 'solid-js';
-import Button from '@suid/material/Button';
-import { IconButton } from '@suid/material';
-import { ContentCopyOutlined } from '@suid/icons-material';
+import { createSmulog, useDialog } from '~/public/smulog/smulog';
 
 interface CopyDialogReturns {
 
@@ -19,6 +19,7 @@ interface CopyDialogProps {
 }
 
 const copyDialog = createSmulog<CopyDialogReturns, CopyDialogProps>((props: CopyDialogProps) => {
+    const theme = useTheme();
     const [value, setValue] = createSignal(props.value ?? '');
 
     const dialog = useDialog<CopyDialogReturns>();
@@ -26,6 +27,9 @@ const copyDialog = createSmulog<CopyDialogReturns, CopyDialogProps>((props: Copy
     dialog.setButtons({
         positive: () => (
             <Button
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 onClick={e => {
                     dialog.close({
                         response: 'positive',
@@ -44,6 +48,9 @@ const copyDialog = createSmulog<CopyDialogReturns, CopyDialogProps>((props: Copy
             direction="column"
             spacing={1}>
             <Typography
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 variant='body1'>
                 {props.message}
             </Typography>
@@ -60,6 +67,9 @@ const copyDialog = createSmulog<CopyDialogReturns, CopyDialogProps>((props: Copy
                         readOnly: true
                     }} />
                 <Button
+                    sx={{
+                        color: theme.palette.text.primary
+                    }}
                     startIcon={<ContentCopyOutlined />}
                     onClick={async e => {
                         await navigator.clipboard.writeText(value());

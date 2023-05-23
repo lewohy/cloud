@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from '@suid/material';
+import { Box, CircularProgress, useTheme } from '@suid/material';
 import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
 import axios from 'axios';
@@ -22,6 +22,7 @@ interface PreviewDialogProps {
 }
 
 const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((props: PreviewDialogProps) => {
+    const theme = useTheme();
     const mimeType = createMemo(() => mime.getType(props.file.name));
     const [text, setText] = createSignal<string | null>(null);
     const type = createMemo(() => {
@@ -33,6 +34,9 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
     dialog.setButtons({
         positive: () => (
             <Button
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 onClick={e => {
                     dialog.close({
                         response: 'positive'
@@ -43,6 +47,9 @@ const previewDialog = createSmulog<PreviewDialogReturns, PreviewDialogProps>((pr
         ),
         negative: () => (
             <Button
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 onClick={e => {
                     dialog.close();
                 }}>

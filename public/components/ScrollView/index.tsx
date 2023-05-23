@@ -30,6 +30,7 @@ export const ScrollView = (props: ScrollViewProps) => {
     const padding = createMemo(() => props.padding ?? 4);
     const showScrollbar = createMemo(() => props.showScrollbar ?? true);
 
+    // TODO: 스크롤바 색 지정
     return (
         <Stack
             ref={setView}
@@ -49,7 +50,7 @@ export const ScrollView = (props: ScrollViewProps) => {
                 },
                 '&::-webkit-scrollbar-thumb': {
                     width: `${width()}px`,
-                    background: theme.palette.primary.light,
+                    backgroundColor: 'secondary.main',
                     backgroundClip: 'padding-box',
                     borderRadius: `${width()}px`,
                     border: `${padding()}px solid transparent`,
@@ -57,19 +58,19 @@ export const ScrollView = (props: ScrollViewProps) => {
                 },
                 '&::-webkit-scrollbar-thumb:active': {
                     width: `${width()}px`,
-                    background: theme.palette.primary.dark,
+                    backgroundColor: 'primary.dark',
                     backgroundClip: 'padding-box',
                     borderRadius: `${width()}px`,
                     border: `${padding()}px solid transparent`,
                     boxSizing: 'content-box'
                 },
                 '&::-webkit-scrollbar-track': {
-                    background: 'transparent',
+                    backgroundColor: 'transparent',
                     borderRadius: `${width() / 2}px`,
                     margin: `${padding()}px`,
                 },
                 '&::-webkit-scrollbar-corner': {
-                    background: 'transparent'
+                    backgroundColor: 'transparent'
                 }
             }}>
             <Stack

@@ -1,4 +1,4 @@
-import { Box } from '@suid/material';
+import { Box, useTheme } from '@suid/material';
 import Modal from '@suid/material/Modal';
 import Stack from '@suid/material/Stack';
 import Typography from '@suid/material/Typography';
@@ -71,6 +71,7 @@ class Smulog<ReturnType, Props> {
 }
 
 export function SmulogContainer(props: { children: JSX.Element }) {
+    const theme = useTheme();
     const [smulogDataList, setSmulogDataList] = createSignal<Array<SmulogData<any, any>>>([]);
 
     const context: SmulogContainerContext<any, any> = {
@@ -133,7 +134,7 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                         height: 'auto',
                                                         maxWidth: '100vw',
                                                         maxHeight: '80%',
-                                                        bgcolor: 'background.default',
+                                                        backgroundColor: theme.palette.background.paper,
                                                         boxShadow: "0px 0px 32px rgba(0,0,0,0.2)",
                                                         borderRadius: 1
                                                     }}>
@@ -154,7 +155,8 @@ export function SmulogContainer(props: { children: JSX.Element }) {
                                                                 <Typography
                                                                     variant="h6"
                                                                     sx={{
-                                                                        padding: '16px 0px'
+                                                                        padding: '16px 0px',
+                                                                        color: theme.palette.text.primary
                                                                     }}>
                                                                     {data.option.title}
                                                                 </Typography>

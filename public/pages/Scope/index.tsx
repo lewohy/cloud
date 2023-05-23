@@ -1,9 +1,10 @@
 import { useNavigate } from '@solidjs/router';
+import { useMediaQuery, useTheme } from '@suid/material';
 import Button from '@suid/material/Button';
 import Stack from '@suid/material/Stack';
 import TextField from '@suid/material/TextField';
 import Typography from '@suid/material/Typography';
-import { JSX, createSignal } from 'solid-js';
+import { JSX, createEffect, createMemo, createSignal } from 'solid-js';
 import { ScrollView } from '~/public/components/ScrollView';
 
 export interface ScopeProps {
@@ -11,23 +12,20 @@ export interface ScopeProps {
 }
 
 export const Scope = (props: ScopeProps) => {
+    const theme = useTheme();
     const navigate = useNavigate();
     const [scopeName, setScopeName] = createSignal('');
-    
-    const onUseClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = async e => {
-        if (scopeName().length === 0) {
-            return;
-        }
-        
-        navigate(`/storage/${scopeName()}`);
-    };
+
+    createEffect(() => {    
+        console.log('Scope theme', theme.palette.mode);
+    });
 
     return (
         <Stack
             sx={{
                 width: '100%',
                 height: '100%',
-                backgroundColor: 'secondary.main'
+                backgroundColor: theme.palette.secondary.main
             }}
             justifyContent="center"
             alignItems="center">
@@ -39,7 +37,6 @@ export const Scope = (props: ScopeProps) => {
                     }}
                     justifyContent="center"
                     alignItems="center">
-
                             
                     <Stack
                         sx={{
@@ -49,7 +46,7 @@ export const Scope = (props: ScopeProps) => {
                             maxHeight: '400px',
                             padding: '64px',
                             borderRadius: '8px',
-                            backgroundColor: 'background.default'
+                            backgroundColor: theme.palette.background.paper
                         }}
                         justifyContent="start"
                         alignItems="start"
@@ -61,18 +58,19 @@ export const Scope = (props: ScopeProps) => {
                             }}
                             spacing="5px">
                             <Typography
+                                color='primary'
                                 sx={{
-                                    color: 'text.primary'
+                                    color: theme.palette.text.primary
                                 }}
                                 variant="h4">
-                                        Input Scope Name
+                                Input Scope Name
                             </Typography>
                             <Typography
                                 variant="body1"
                                 sx={{
-                                    color: 'text.primary'
+                                    color: theme.palette.text.primary
                                 }}>
-                                        Create a new scope or use an existing scope.
+                                Create a new scope or use an existing scope.
                             </Typography>
                         </Stack>
 
@@ -102,8 +100,14 @@ export const Scope = (props: ScopeProps) => {
                             alignItems="end">
                             <Button
                                 variant='contained'
-                                onClick={onUseClick}>
-                                        Use
+                                onClick={e => {
+                                    if (scopeName().length === 0) {
+                                        return;
+                                    }
+                                    
+                                    navigate(`/storage/${scopeName()}`);
+                                }}>
+                                    Use
                             </Button>
                         </Stack>
                     </Stack>

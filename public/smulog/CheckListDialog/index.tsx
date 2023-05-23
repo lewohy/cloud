@@ -1,3 +1,4 @@
+import { useTheme } from '@suid/material';
 import Button from '@suid/material/Button';
 import Checkbox from '@suid/material/Checkbox';
 import Divider from '@suid/material/Divider';
@@ -11,7 +12,6 @@ import Typography from '@suid/material/Typography';
 import { createSignal, For } from 'solid-js';
 import { ScrollView } from '~/public/components/ScrollView';
 import { createSmulog, useDialog } from '~/public/smulog/smulog';
-import Box from '@suid/material/Box';
 
 export interface CheckListDialogReturns {
     checkedList: FileSystemFileEntry[];
@@ -23,12 +23,16 @@ export interface CheckListDialogProps {
 }
 
 export const checkListDialog = createSmulog<CheckListDialogReturns, CheckListDialogProps>((props: CheckListDialogProps) => {
+    const theme = useTheme();
     const dialog = useDialog<CheckListDialogReturns>();
     const [checkedList, setCheckedItem] = createSignal<FileSystemFileEntry[]>([...props.list]);
 
     dialog.setButtons({
         positive: () => (
             <Button
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 onClick={e => {
                     dialog.close({
                         response: 'positive',
@@ -42,6 +46,9 @@ export const checkListDialog = createSmulog<CheckListDialogReturns, CheckListDia
         ),
         negative: () => (
             <Button
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 onClick={e => {
                     dialog.close();
                 }}>
@@ -58,6 +65,9 @@ export const checkListDialog = createSmulog<CheckListDialogReturns, CheckListDia
             }}
             direction="column">
             <Typography
+                sx={{
+                    color: theme.palette.text.primary
+                }}
                 variant='body1'>
                 {props.message}
             </Typography>
