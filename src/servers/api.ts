@@ -20,6 +20,26 @@ export default function startAPIServer(app: core.Express) {
             sendError(res, e);
         }
     });
+    
+    app.post<{}, cloud.protocol.storage.PostResponse, cloud.protocol.storage.PostRequest>(/\/api\/storage/, async (req, res) => {
+        try {
+            const request = req.body as cloud.protocol.storage.PostRequest;
+            const entity = request.entity;
+
+            if (entity.type === 'directory') {
+                if (entity.state === 'normal') {
+                    await createNormalDirectory({
+                        scope: '',
+                        path: [],
+                    }, entity);
+                }
+
+                res.status(200).send();
+            }
+        } catch (e) {
+            sendError(res, e);
+        }
+    });
 
     app.post<{}, cloud.protocol.storage.PostResponse, cloud.protocol.storage.PostRequest>(/\/api\/storage\/([^\/]+)(\/(.*))?/, async (req, res) => {
         try {

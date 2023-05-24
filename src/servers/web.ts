@@ -39,6 +39,7 @@ export default function startWebServer(app: core.Express) {
         '/storage/:scope',
         '/storage/:scope/*'
     ], (req, res) => {
+        // TODO: try catch
         const location: cloud.Location = {
             scope: req.params.scope,
             path: (req.params[0] || '').split('/')
@@ -46,13 +47,13 @@ export default function startWebServer(app: core.Express) {
 
         const item = getItem(location);
 
-        if (item === undefined) {
+        if (item?.type === 'file') {
+            const absolutePath = getAbsoluteBasePath(location);
+            res.download(absolutePath);
+        } else {
             res.status(200).set({
                 'Content-Type': 'text/html'
             }).end(fs.readFileSync(path.resolve(process.cwd(), './public/index.html'), 'utf-8'));
-        } else {
-            const absolutePath = getAbsoluteBasePath(location);
-            res.download(absolutePath);
         }
     });
 

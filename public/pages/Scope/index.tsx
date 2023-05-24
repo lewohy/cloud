@@ -5,6 +5,7 @@ import Stack from '@suid/material/Stack';
 import TextField from '@suid/material/TextField';
 import Typography from '@suid/material/Typography';
 import { createEffect, createSignal } from 'solid-js';
+import storage from '~/public/ts/request/storage';
 import { ScrollView } from '~/public/components/ScrollView';
 
 export interface ScopeProps {
@@ -86,8 +87,20 @@ export const Scope = (props: ScopeProps) => {
                                 autoComplete="off"
                                 value={scopeName()}
                                 onChange={(e, value) => setScopeName(value)}
-                                onKeyPress={e => {
+                                onKeyPress={async e => {
                                     if (e.key === 'Enter') {
+                                        if (scopeName().length === 0) {
+                                            return;
+                                        }
+
+                                        const result = await storage.post(`/api/storage`, {
+                                            entity: {
+                                                type: 'directory',
+                                                name: scopeName(),
+                                                state: 'normal'
+                                            }
+                                        });
+                                    
                                         navigate(`/storage/${scopeName()}`);
                                     }
                                 }} />
@@ -100,10 +113,18 @@ export const Scope = (props: ScopeProps) => {
                             alignItems="end">
                             <Button
                                 variant='contained'
-                                onClick={e => {
+                                onClick={async e => {
                                     if (scopeName().length === 0) {
                                         return;
                                     }
+
+                                    const result = await storage.post(`/api/storage`, {
+                                        entity: {
+                                            type: 'directory',
+                                            name: scopeName(),
+                                            state: 'normal'
+                                        }
+                                    });
                                     
                                     navigate(`/storage/${scopeName()}`);
                                 }}>
