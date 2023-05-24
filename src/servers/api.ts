@@ -21,7 +21,7 @@ export default function startAPIServer(app: core.Express) {
         }
     });
     
-    app.post<{}, cloud.protocol.storage.PostResponse, cloud.protocol.storage.PostRequest>(/\/api\/storage/, async (req, res) => {
+    app.post<{}, cloud.protocol.storage.PostResponse, cloud.protocol.storage.PostRequest>(/\/api\/storage$/, async (req, res) => {
         try {
             const request = req.body as cloud.protocol.storage.PostRequest;
             const entity = request.entity;
