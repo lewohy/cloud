@@ -42,7 +42,7 @@ export const Scope = (props: ScopeProps) => {
                     <Stack
                         sx={{
                             width: '100%',
-                            height: '100%',
+                            height: 'auto',
                             maxWidth: '640px',
                             maxHeight: '400px',
                             padding: '64px',
@@ -109,6 +109,7 @@ export const Scope = (props: ScopeProps) => {
                         <Stack
                             sx={{
                                 width: '100%',
+                                paddingTop: '8px'
                             }}
                             alignItems="end">
                             <Button
