@@ -10,6 +10,7 @@ import startAPIServer from './servers/api';
 import startUploadServer from './servers/upload';
 import startWebServer from './servers/web';
 import startWebSocketServer from './servers/ws';
+import { networkInterfaces } from 'os';
 
 async function createServer() {
     const app = express();
@@ -52,7 +53,23 @@ async function createServer() {
     
     server.listen(config.port, () => {
         logger.info(`Server is listening on http://127.0.0.1:${config.port}`);
+        getLocalIPList().forEach(ip => {
+            logger.info(`Server is listening on http://${ip}:${config.port}`);
+        });
     });
+}
+
+function getLocalIPList(): string[] {
+    const interfaces = networkInterfaces();
+    const ipList: string[] = [];
+    for (const name of Object.keys(interfaces)) {
+        for (const net of interfaces[name] ?? []) {
+            if (net.family === 'IPv4' && !net.internal) {
+                ipList.push(net.address);
+            }
+        }
+    }
+    return ipList;
 }
 
 createServer();
