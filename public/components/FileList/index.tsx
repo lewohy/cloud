@@ -61,7 +61,7 @@ export const FileList = (props: FileListProps) => {
         return io(location.origin, {
             path: '/socket.io',
             query: {
-                room: getPathString(props.location)
+                room: decodeURI(getPathString(props.location))
             }
         })
     }, null);
